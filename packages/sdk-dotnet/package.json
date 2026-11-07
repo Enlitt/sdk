@@ -1,0 +1,13 @@
+{
+  "name": "@enlitt/sdk-dotnet",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Workspace wrapper for the Enlitt .NET SDK. The packages are published to NuGet, never to npm.",
+  "scripts": {
+    "test": "sh ../../tools/dotnet.sh test",
+    "lint": "sh ../../tools/dotnet.sh format --verify-no-changes",
+    "typecheck": "sh ../../tools/dotnet.sh build -warnaserror",
+    "build": "sh ../../tools/dotnet.sh pack -c Release -o dist",
+    "sync:contract": "cp ../protocol/generated/contract.json src/Enlitt/contract.json"
+  }
+}

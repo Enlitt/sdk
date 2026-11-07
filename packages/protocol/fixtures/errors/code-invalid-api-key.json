@@ -1,0 +1,19 @@
+{
+  "description": "An invalid business credential is an authentication error.",
+  "http_status": 401,
+  "headers": {},
+  "body": {
+    "error": {
+      "message": "The API key is invalid.",
+      "type": "authentication_error",
+      "param": null,
+      "code": "invalid_api_key"
+    }
+  },
+  "expected": {
+    "code": "invalid_api_key",
+    "code_recognized": true,
+    "class": "authentication",
+    "retryable": false
+  }
+}

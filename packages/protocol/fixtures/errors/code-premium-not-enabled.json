@@ -1,0 +1,19 @@
+{
+  "description": "The application's premium switch is off, so a premium start or terminal report is refused for the business to fix.",
+  "http_status": 403,
+  "headers": {},
+  "body": {
+    "error": {
+      "message": "Premium credit is not enabled for this application.",
+      "type": "permission_error",
+      "param": null,
+      "code": "premium_not_enabled"
+    }
+  },
+  "expected": {
+    "code": "premium_not_enabled",
+    "code_recognized": true,
+    "class": "authorization",
+    "retryable": false
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "@enlitt/sdk-python",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Workspace wrapper for the Enlitt Python SDK (PyPI: enlitt). Not published to npm.",
+  "scripts": {
+    "test": "uv run pytest",
+    "lint": "uv run ruff check . && uv run ruff format --check .",
+    "typecheck": "uv run mypy --strict src tests",
+    "build": "uv build",
+    "sync:contract": "cp ../protocol/generated/contract.json src/enlitt/_contract.json"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "description": "Rejects the unsupported structured-output control.",
+  "endpoint": "create-response",
+  "valid": false,
+  "error_param": "text",
+  "body": {
+    "model": "enlitt-standard",
+    "messages": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "type": "text",
+            "text": "Hello"
+          }
+        ]
+      }
+    ],
+    "text": {
+      "format": {
+        "type": "json_schema"
+      }
+    }
+  }
+}

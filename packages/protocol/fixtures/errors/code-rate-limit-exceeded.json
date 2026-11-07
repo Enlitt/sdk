@@ -1,0 +1,22 @@
+{
+  "description": "The rate limit is the only retryable refusal with a floor.",
+  "http_status": 429,
+  "headers": {
+    "retry-after": "1"
+  },
+  "body": {
+    "error": {
+      "message": "Too many requests are active for this user.",
+      "type": "rate_limit_error",
+      "param": null,
+      "code": "rate_limit_exceeded"
+    }
+  },
+  "expected": {
+    "code": "rate_limit_exceeded",
+    "code_recognized": true,
+    "class": "rate_limit",
+    "retryable": true,
+    "retry_after_ms": 1000
+  }
+}

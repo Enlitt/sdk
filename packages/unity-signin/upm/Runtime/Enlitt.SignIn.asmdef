@@ -1,0 +1,14 @@
+{
+  "name": "Enlitt.SignIn",
+  "rootNamespace": "Enlitt.SignIn",
+  "references": [],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

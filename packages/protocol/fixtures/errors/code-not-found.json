@@ -1,0 +1,19 @@
+{
+  "description": "A missing or hidden resource is not found.",
+  "http_status": 404,
+  "headers": {},
+  "body": {
+    "error": {
+      "message": "The requested resource was not found.",
+      "type": "invalid_request_error",
+      "param": null,
+      "code": "not_found"
+    }
+  },
+  "expected": {
+    "code": "not_found",
+    "code_recognized": true,
+    "class": "generic",
+    "retryable": false
+  }
+}

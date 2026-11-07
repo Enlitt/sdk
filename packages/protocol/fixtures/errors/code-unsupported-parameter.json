@@ -1,0 +1,19 @@
+{
+  "description": "An unsupported request field is refused before work starts.",
+  "http_status": 400,
+  "headers": {},
+  "body": {
+    "error": {
+      "message": "This parameter is not supported.",
+      "type": "invalid_request_error",
+      "param": "store",
+      "code": "unsupported_parameter"
+    }
+  },
+  "expected": {
+    "code": "unsupported_parameter",
+    "code_recognized": true,
+    "class": "generic",
+    "retryable": false
+  }
+}

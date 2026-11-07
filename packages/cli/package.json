@@ -1,0 +1,44 @@
+{
+  "name": "@enlitt/cli",
+  "version": "0.1.0",
+  "description": "Terminal client for an Enlitt business account, built to be driven by a coding agent",
+  "homepage": "https://enlitt.com/docs",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/enlitt/sdk.git",
+    "directory": "packages/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/enlitt/sdk/issues"
+  },
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "enlitt": "dist/bin.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "prepack": "pnpm build"
+  },
+  "devDependencies": {
+    "@enlitt/protocol": "workspace:*",
+    "@types/node": "^24.13.3",
+    "tsup": "^8.5.1",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.11"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

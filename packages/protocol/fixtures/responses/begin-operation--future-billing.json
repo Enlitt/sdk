@@ -1,0 +1,22 @@
+{
+  "description": "Reads a future billing enum as the reserved other value.",
+  "endpoint": "begin-operation",
+  "http_status": 200,
+  "future": true,
+  "body": {
+    "operation_id": "op_fixture_3",
+    "billing": "delegated",
+    "report_terminal": true,
+    "effective_max_charge_nano_usd": "1000",
+    "reserved_nano_usd": "1000",
+    "terminal_deadline": "2026-09-29T12:00:00Z"
+  },
+  "expected_tolerant": {
+    "operation_id": "op_fixture_3",
+    "billing": "other",
+    "report_terminal": true,
+    "effective_max_charge_nano_usd": "1000",
+    "reserved_nano_usd": "1000",
+    "terminal_deadline": "2026-09-29T12:00:00Z"
+  }
+}

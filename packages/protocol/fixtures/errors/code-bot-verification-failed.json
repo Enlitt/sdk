@@ -1,0 +1,18 @@
+{
+  "description": "A failed bot-protection check refuses the dashboard request.",
+  "http_status": 403,
+  "headers": {},
+  "body": {
+    "error": {
+      "code": "bot_verification_failed",
+      "message": "Bot verification failed."
+    },
+    "request_id": "req_fixture_bot_verification"
+  },
+  "expected": {
+    "code": "bot_verification_failed",
+    "code_recognized": true,
+    "class": "generic",
+    "retryable": false
+  }
+}

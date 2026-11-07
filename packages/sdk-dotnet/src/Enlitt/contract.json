@@ -1,0 +1,491 @@
+{
+  "contract_format": 1,
+  "api_version": "2026-10-05",
+  "version_header": "Enlitt-Version",
+  "unknown_enum_value": "other",
+  "unrecognized_error_code": "unrecognized",
+  "idempotency_key": {
+    "min_length": 16,
+    "max_length": 255,
+    "min_retention_days": 30
+  },
+  "error_types": [
+    "authentication_error",
+    "permission_error",
+    "invalid_request_error",
+    "insufficient_credits_error",
+    "rate_limit_error",
+    "conflict_error",
+    "server_error"
+  ],
+  "error_codes": {
+    "access_denied": {
+      "type": "invalid_request_error",
+      "http_status": 400,
+      "retryable": false,
+      "retry_after": "forbidden",
+      "authorize_url": "forbidden",
+      "admissible_max_charge": "forbidden",
+      "limit_rule": "forbidden"
+    },
+    "admin_authentication_required": {
+      "type": "authentication_error",
+      "http_status": 401,
+      "retryable": false,
+      "retry_after": "forbidden",
+      "authorize_url": "forbidden",
+      "admissible_max_charge": "forbidden",
+      "limit_rule": "forbidden"
+    },
+    "authorization_pending": {
+      "type": "invalid_request_error",
+      "http_status": 400,
+      "retryable": false,
+      "retry_after": "forbidden",
+      "authorize_url": "forbidden",
+      "admissible_max_charge": "forbidden",
+      "limit_rule": "forbidden"
+    },
+    "bot_verification_failed": {
+      "type": "permission_error",
+      "http_status": 403,
+      "retryable": false,
+      "retry_after": "forbidden",
+      "authorize_url": "forbidden",
+      "admissible_max_charge": "forbidden",
+      "limit_rule": "forbidden"
+    },
+    "business_name_unavailable": {
+      "type": "conflict_error",
+      "http_status": 409,
+      "retryable": false,
+      "retry_after": "forbidden",
+      "authorize_url": "forbidden",
+      "admissible_max_charge": "forbidden",
+      "limit_rule": "forbidden"
+    },
+    "business_selection_required": {
+      "type": "invalid_request_error",
+      "http_status": 409,
+      "retryable": false,
+      "retry_after": "forbidden",
+      "authorize_url": "forbidden",
+      "admissible_max_charge": "forbidden",
+      "limit_rule": "forbidden"
+    },
+    "conflict_error": {
+      "type": "conflict_error",
+      "http_status": 409,
+      "retryable": false,
+      "retry_after": "forbidden",
+      "authorize_url": "forbidden",
+      "admissible_max_charge": "forbidden",
+      "limit_rule": "forbidden"
+    },
+    "dashboard_login_required": {
+      "type": "authentication_error",
+      "http_status": 401,
+      "retryable": false,
+      "retry_after": "forbidden",
+      "authorize_url": "forbidden",
+      "admissible_max_charge": "forbidden",
+      "limit_rule": "forbidden"
+    },
+    "expired_token": {
+      "type": "invalid_request_error",
+      "http_status": 400,
+      "retryable": false,
+      "retry_after": "forbidden",
+      "authorize_url": "forbidden",
+      "admissible_max_charge": "forbidden",
+      "limit_rule": "forbidden"
+    },
+    "idempotency_replay_unavailable": {
+      "type": "conflict_error",
+      "http_status": 409,
+      "retryable": false,
+      "retry_after": "forbidden",
+      "authorize_url": "forbidden",
+      "admissible_max_charge": "forbidden",
+      "limit_rule": "forbidden"
+    },
+    "insufficient_permissions": {
+      "type": "permission_error",
+      "http_status": 403,
+      "retryable": false,
+      "retry_after": "forbidden",
+      "authorize_url": "forbidden",
+      "admissible_max_charge": "forbidden",
+      "limit_rule": "forbidden"
+    },
+    "invalid_api_key": {
+      "type": "authentication_error",
+      "http_status": 401,
+      "retryable": false,
+      "retry_after": "forbidden",
+      "authorize_url": "forbidden",
+      "admissible_max_charge": "forbidden",
+      "limit_rule": "forbidden"
+    },
+    "invalid_phone_code": {
+      "type": "invalid_request_error",
+      "http_status": 400,
+      "retryable": false,
+      "retry_after": "forbidden",
+      "authorize_url": "forbidden",
+      "admissible_max_charge": "forbidden",
+      "limit_rule": "forbidden"
+    },
+    "invalid_sign_in_code": {
+      "type": "invalid_request_error",
+      "http_status": 400,
+      "retryable": false,
+      "retry_after": "forbidden",
+      "authorize_url": "forbidden",
+      "admissible_max_charge": "forbidden",
+      "limit_rule": "forbidden"
+    },
+    "invalid_value": {
+      "type": "invalid_request_error",
+      "http_status": 400,
+      "retryable": false,
+      "retry_after": "forbidden",
+      "authorize_url": "forbidden",
+      "admissible_max_charge": "forbidden",
+      "limit_rule": "forbidden"
+    },
+    "not_found": {
+      "type": "invalid_request_error",
+      "http_status": 404,
+      "retryable": false,
+      "retry_after": "forbidden",
+      "authorize_url": "forbidden",
+      "admissible_max_charge": "forbidden",
+      "limit_rule": "forbidden"
+    },
+    "operation_in_progress": {
+      "type": "conflict_error",
+      "http_status": 409,
+      "retryable": false,
+      "retry_after": "forbidden",
+      "authorize_url": "forbidden",
+      "admissible_max_charge": "forbidden",
+      "limit_rule": "forbidden"
+    },
+    "payment_declined": {
+      "type": "invalid_request_error",
+      "http_status": 402,
+      "retryable": false,
+      "retry_after": "forbidden",
+      "authorize_url": "forbidden",
+      "admissible_max_charge": "forbidden",
+      "limit_rule": "forbidden"
+    },
+    "personal_login_required": {
+      "type": "authentication_error",
+      "http_status": 401,
+      "retryable": false,
+      "retry_after": "forbidden",
+      "authorize_url": "forbidden",
+      "admissible_max_charge": "forbidden",
+      "limit_rule": "forbidden"
+    },
+    "phone_number_not_supported": {
+      "type": "invalid_request_error",
+      "http_status": 400,
+      "retryable": false,
+      "retry_after": "forbidden",
+      "authorize_url": "forbidden",
+      "admissible_max_charge": "forbidden",
+      "limit_rule": "forbidden"
+    },
+    "phone_number_unavailable": {
+      "type": "conflict_error",
+      "http_status": 409,
+      "retryable": false,
+      "retry_after": "forbidden",
+      "authorize_url": "forbidden",
+      "admissible_max_charge": "forbidden",
+      "limit_rule": "forbidden"
+    },
+    "phone_verification_required": {
+      "type": "permission_error",
+      "http_status": 403,
+      "retryable": false,
+      "retry_after": "forbidden",
+      "authorize_url": "forbidden",
+      "admissible_max_charge": "forbidden",
+      "limit_rule": "forbidden"
+    },
+    "premium_balance_exhausted": {
+      "type": "insufficient_credits_error",
+      "http_status": 403,
+      "retryable": false,
+      "retry_after": "forbidden",
+      "authorize_url": "allowed",
+      "admissible_max_charge": "allowed",
+      "limit_rule": "forbidden"
+    },
+    "premium_not_enabled": {
+      "type": "permission_error",
+      "http_status": 403,
+      "retryable": false,
+      "retry_after": "forbidden",
+      "authorize_url": "forbidden",
+      "admissible_max_charge": "forbidden",
+      "limit_rule": "forbidden"
+    },
+    "provider_error": {
+      "type": "server_error",
+      "http_status": 502,
+      "retryable": true,
+      "retry_after": "forbidden",
+      "authorize_url": "forbidden",
+      "admissible_max_charge": "forbidden",
+      "limit_rule": "forbidden"
+    },
+    "rate_limit_exceeded": {
+      "type": "rate_limit_error",
+      "http_status": 429,
+      "retryable": true,
+      "retry_after": "required",
+      "authorize_url": "forbidden",
+      "admissible_max_charge": "forbidden",
+      "limit_rule": "forbidden"
+    },
+    "reauthentication_required": {
+      "type": "authentication_error",
+      "http_status": 401,
+      "retryable": false,
+      "retry_after": "forbidden",
+      "authorize_url": "forbidden",
+      "admissible_max_charge": "forbidden",
+      "limit_rule": "forbidden"
+    },
+    "request_too_large": {
+      "type": "invalid_request_error",
+      "http_status": 413,
+      "retryable": false,
+      "retry_after": "forbidden",
+      "authorize_url": "forbidden",
+      "admissible_max_charge": "forbidden",
+      "limit_rule": "forbidden"
+    },
+    "server_error": {
+      "type": "server_error",
+      "http_status": 500,
+      "retryable": true,
+      "retry_after": "forbidden",
+      "authorize_url": "forbidden",
+      "admissible_max_charge": "forbidden",
+      "limit_rule": "forbidden"
+    },
+    "slow_down": {
+      "type": "invalid_request_error",
+      "http_status": 400,
+      "retryable": false,
+      "retry_after": "forbidden",
+      "authorize_url": "forbidden",
+      "admissible_max_charge": "forbidden",
+      "limit_rule": "forbidden"
+    },
+    "spending_limit_exceeded": {
+      "type": "insufficient_credits_error",
+      "http_status": 403,
+      "retryable": false,
+      "retry_after": "forbidden",
+      "authorize_url": "allowed",
+      "admissible_max_charge": "forbidden",
+      "limit_rule": "required"
+    },
+    "standard_balance_exhausted": {
+      "type": "insufficient_credits_error",
+      "http_status": 403,
+      "retryable": false,
+      "retry_after": "forbidden",
+      "authorize_url": "allowed",
+      "admissible_max_charge": "forbidden",
+      "limit_rule": "forbidden"
+    },
+    "subscription_inactive": {
+      "type": "insufficient_credits_error",
+      "http_status": 403,
+      "retryable": false,
+      "retry_after": "forbidden",
+      "authorize_url": "allowed",
+      "admissible_max_charge": "forbidden",
+      "limit_rule": "forbidden"
+    },
+    "unsupported_parameter": {
+      "type": "invalid_request_error",
+      "http_status": 400,
+      "retryable": false,
+      "retry_after": "forbidden",
+      "authorize_url": "forbidden",
+      "admissible_max_charge": "forbidden",
+      "limit_rule": "forbidden"
+    },
+    "unsupported_value": {
+      "type": "invalid_request_error",
+      "http_status": 400,
+      "retryable": false,
+      "retry_after": "forbidden",
+      "authorize_url": "forbidden",
+      "admissible_max_charge": "forbidden",
+      "limit_rule": "forbidden"
+    }
+  },
+  "closed_sets": {
+    "api_key.scope": [
+      "model",
+      "reporting"
+    ],
+    "api_key.status": [
+      "active",
+      "revoked",
+      "expired"
+    ],
+    "application.environment": [
+      "test",
+      "live"
+    ],
+    "application.status": [
+      "active",
+      "suspended",
+      "closed"
+    ],
+    "cli_authorization.kind": [
+      "login",
+      "step_up"
+    ],
+    "contact.type": [
+      "email",
+      "phone"
+    ],
+    "email_sign_in.account_type": [
+      "user",
+      "business"
+    ],
+    "order.kind": [
+      "subscription",
+      "bundle"
+    ],
+    "order.refund.eligibility": [
+      "full",
+      "half",
+      "none"
+    ],
+    "order.refund.reason": [
+      "unused",
+      "within_usage_threshold",
+      "usage_threshold_exceeded",
+      "window_expired",
+      "not_active",
+      "gift"
+    ],
+    "order.status": [
+      "pending",
+      "active",
+      "refund_pending",
+      "refunded",
+      "failed",
+      "expired"
+    ],
+    "payout.blocked_reason": [
+      "payout_blocked",
+      "below_minimum",
+      "outstanding_deficit",
+      "tax_details_required",
+      "payout_account_incomplete",
+      "monthly_payout_taken",
+      "payout_pending"
+    ],
+    "payout.connected_account_status": [
+      "none",
+      "onboarding",
+      "restricted",
+      "enabled",
+      "rejected"
+    ],
+    "personal_application_call.credit_type": [
+      "standard",
+      "premium"
+    ],
+    "personal_application_call.sort": [
+      "time",
+      "charge"
+    ],
+    "personal_application_call.status": [
+      "pending",
+      "running",
+      "completed",
+      "failed",
+      "canceled",
+      "expired"
+    ],
+    "plan.interval": [
+      "month",
+      "year"
+    ],
+    "premium_operation.billing": [
+      "managed"
+    ],
+    "premium_terminal.status": [
+      "completed",
+      "failed",
+      "canceled"
+    ],
+    "response.incomplete_details.reason": [
+      "max_output_tokens"
+    ],
+    "response.output_item.status": [
+      "in_progress",
+      "completed",
+      "incomplete"
+    ],
+    "response.status": [
+      "completed",
+      "failed",
+      "in_progress",
+      "cancelled",
+      "queued",
+      "incomplete"
+    ],
+    "response_stream.type": [
+      "response.created",
+      "response.in_progress",
+      "response.output_item.added",
+      "response.output_item.done",
+      "response.content_part.added",
+      "response.content_part.done",
+      "response.output_text.delta",
+      "response.output_text.done",
+      "response.function_call_arguments.delta",
+      "response.function_call_arguments.done",
+      "response.completed",
+      "response.incomplete",
+      "response.failed"
+    ],
+    "subscription.change_mode": [
+      "checkout",
+      "change",
+      "locked",
+      "unavailable"
+    ],
+    "subscription.locked_downgrade": [
+      "checkout",
+      "change"
+    ],
+    "subscription.service_tier": [
+      "normal",
+      "reduced",
+      "minimum"
+    ],
+    "subscription.status": [
+      "active",
+      "past_due",
+      "canceled",
+      "suspended"
+    ]
+  }
+}

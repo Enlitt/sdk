@@ -1,0 +1,19 @@
+{
+  "description": "A conflicting operation is a permanent conflict error.",
+  "http_status": 409,
+  "headers": {},
+  "body": {
+    "error": {
+      "message": "This operation conflicts with current state.",
+      "type": "conflict_error",
+      "param": null,
+      "code": "conflict_error"
+    }
+  },
+  "expected": {
+    "code": "conflict_error",
+    "code_recognized": true,
+    "class": "generic",
+    "retryable": false
+  }
+}

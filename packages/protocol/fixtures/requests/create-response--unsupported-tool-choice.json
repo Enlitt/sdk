@@ -1,0 +1,21 @@
+{
+  "description": "Rejects the unsupported tool-choice control.",
+  "endpoint": "create-response",
+  "valid": false,
+  "error_param": "tool_choice",
+  "body": {
+    "model": "enlitt-standard",
+    "messages": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "type": "text",
+            "text": "Hello"
+          }
+        ]
+      }
+    ],
+    "tool_choice": "required"
+  }
+}

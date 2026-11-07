@@ -1,0 +1,26 @@
+{
+  "description": "Carries an HTTPS image input beside text.",
+  "endpoint": "create-response",
+  "valid": true,
+  "body": {
+    "model": "enlitt-standard",
+    "messages": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "type": "text",
+            "text": "Describe this image."
+          },
+          {
+            "type": "image",
+            "source": {
+              "type": "url",
+              "url": "https://example.com/image.png"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

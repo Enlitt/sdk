@@ -1,0 +1,23 @@
+{
+  "description": "A finite standard ceiling refuses an estimated call.",
+  "http_status": 403,
+  "headers": {},
+  "body": {
+    "error": {
+      "message": "The remaining standard capacity cannot cover this call.",
+      "type": "insufficient_credits_error",
+      "param": null,
+      "code": "standard_balance_exhausted",
+      "enlitt": {
+        "authorize_url": "https://dashboard.enlitt.com/authorize"
+      }
+    }
+  },
+  "expected": {
+    "code": "standard_balance_exhausted",
+    "code_recognized": true,
+    "class": "insufficient_credits",
+    "retryable": false,
+    "authorize_url": "https://dashboard.enlitt.com/authorize"
+  }
+}

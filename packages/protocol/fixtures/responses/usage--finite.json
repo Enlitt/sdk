@@ -1,0 +1,16 @@
+{
+  "description": "Returns finite standard and premium availability in NANOUSD.",
+  "endpoint": "usage",
+  "http_status": 200,
+  "future": false,
+  "body": {
+    "standard": {
+      "remaining_percent": 75,
+      "limit_cap_nano_usd": "500"
+    },
+    "premium": {
+      "remaining_percent": 50,
+      "limit_cap_nano_usd": "1000"
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "description": "The CLI polled sooner than the interval allows.",
+  "http_status": 400,
+  "headers": {},
+  "body": {
+    "error": {
+      "code": "slow_down",
+      "message": "Polling too fast; wait longer between requests."
+    },
+    "request_id": "req_fixture_slow_down"
+  },
+  "expected": {
+    "code": "slow_down",
+    "code_recognized": true,
+    "class": "generic",
+    "retryable": false
+  }
+}

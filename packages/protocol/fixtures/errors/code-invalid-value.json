@@ -1,0 +1,19 @@
+{
+  "description": "A malformed accepted field is invalid input.",
+  "http_status": 400,
+  "headers": {},
+  "body": {
+    "error": {
+      "message": "The field has an invalid value.",
+      "type": "invalid_request_error",
+      "param": "model",
+      "code": "invalid_value"
+    }
+  },
+  "expected": {
+    "code": "invalid_value",
+    "code_recognized": true,
+    "class": "generic",
+    "retryable": false
+  }
+}

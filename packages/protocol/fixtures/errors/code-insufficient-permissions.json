@@ -1,0 +1,19 @@
+{
+  "description": "An out-of-scope credential is an authorization error.",
+  "http_status": 403,
+  "headers": {},
+  "body": {
+    "error": {
+      "message": "This credential does not have the required permission.",
+      "type": "permission_error",
+      "param": null,
+      "code": "insufficient_permissions"
+    }
+  },
+  "expected": {
+    "code": "insufficient_permissions",
+    "code_recognized": true,
+    "class": "authorization",
+    "retryable": false
+  }
+}

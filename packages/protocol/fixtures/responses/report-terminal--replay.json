@@ -1,0 +1,16 @@
+{
+  "description": "Returns the prior terminal settlement on an idempotent replay.",
+  "endpoint": "report-terminal",
+  "http_status": 200,
+  "future": false,
+  "body": {
+    "operation_id": "op_fixture_1",
+    "status": "completed",
+    "idempotent_replay": true,
+    "settlement": {
+      "captured_nano_usd": "700",
+      "released_nano_usd": "300",
+      "business_earnings_nano_usd": "700"
+    }
+  }
+}

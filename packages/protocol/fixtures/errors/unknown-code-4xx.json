@@ -1,0 +1,20 @@
+{
+  "description": "An unknown client error is not treated as retryable.",
+  "http_status": 400,
+  "headers": {},
+  "body": {
+    "error": {
+      "message": "A newer server returned this refusal.",
+      "type": "invalid_request_error",
+      "param": null,
+      "code": "future_client_error"
+    }
+  },
+  "expected": {
+    "code": "future_client_error",
+    "code_recognized": false,
+    "class": "generic",
+    "retryable": false,
+    "message": "Enlitt returned error code \"future_client_error\" (HTTP 400, type \"invalid_request_error\"), which this version of @enlitt/sdk does not recognize. Upgrade @enlitt/sdk to handle it. A newer server returned this refusal."
+  }
+}

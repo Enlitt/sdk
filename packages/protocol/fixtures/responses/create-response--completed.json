@@ -1,0 +1,32 @@
+{
+  "description": "Returns a completed response with text output.",
+  "endpoint": "create-response",
+  "http_status": 200,
+  "future": false,
+  "body": {
+    "id": "resp_fixture_1",
+    "object": "response",
+    "created_at": 1760000000,
+    "completed_at": 1760000001,
+    "status": "completed",
+    "error": null,
+    "incomplete_details": null,
+    "model": "enlitt-standard",
+    "output": [
+      {
+        "type": "message",
+        "id": "msg_fixture_1",
+        "role": "assistant",
+        "status": "completed",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "Hello"
+          }
+        ]
+      }
+    ],
+    "output_text": "Hello",
+    "metadata": {}
+  }
+}

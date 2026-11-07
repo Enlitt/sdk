@@ -1,0 +1,22 @@
+{
+  "description": "An unknown 429 is not assumed to be a retryable rate limit.",
+  "http_status": 429,
+  "headers": {
+    "retry-after": "2"
+  },
+  "body": {
+    "error": {
+      "message": "A newer server returned this limit.",
+      "type": "rate_limit_error",
+      "param": null,
+      "code": "future_limit_error"
+    }
+  },
+  "expected": {
+    "code": "future_limit_error",
+    "code_recognized": false,
+    "class": "generic",
+    "retryable": false,
+    "message": "Enlitt returned error code \"future_limit_error\" (HTTP 429, type \"rate_limit_error\"), which this version of @enlitt/sdk does not recognize. Upgrade @enlitt/sdk to handle it. A newer server returned this limit."
+  }
+}

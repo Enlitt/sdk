@@ -1,0 +1,19 @@
+{
+  "description": "A body over the deployed limit is too large.",
+  "http_status": 413,
+  "headers": {},
+  "body": {
+    "error": {
+      "message": "The request exceeds the allowed size.",
+      "type": "invalid_request_error",
+      "param": null,
+      "code": "request_too_large"
+    }
+  },
+  "expected": {
+    "code": "request_too_large",
+    "code_recognized": true,
+    "class": "generic",
+    "retryable": false
+  }
+}

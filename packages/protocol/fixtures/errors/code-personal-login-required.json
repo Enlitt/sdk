@@ -1,0 +1,19 @@
+{
+  "description": "A missing personal session is a stable login refusal.",
+  "http_status": 401,
+  "headers": {},
+  "body": {
+    "error": {
+      "message": "A personal Enlitt session is required.",
+      "type": "authentication_error",
+      "param": null,
+      "code": "personal_login_required"
+    }
+  },
+  "expected": {
+    "code": "personal_login_required",
+    "code_recognized": true,
+    "class": "login_required",
+    "retryable": false
+  }
+}

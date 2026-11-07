@@ -1,0 +1,22 @@
+{
+  "description": "A rate-limit floor of two seconds becomes 2000 milliseconds.",
+  "http_status": 429,
+  "headers": {
+    "retry-after": "2"
+  },
+  "body": {
+    "error": {
+      "message": "Too many requests are active for this user.",
+      "type": "rate_limit_error",
+      "param": null,
+      "code": "rate_limit_exceeded"
+    }
+  },
+  "expected": {
+    "code": "rate_limit_exceeded",
+    "code_recognized": true,
+    "class": "rate_limit",
+    "retryable": true,
+    "retry_after_ms": 2000
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "description": "A same-input active operation cannot be replayed yet.",
+  "http_status": 409,
+  "headers": {},
+  "body": {
+    "error": {
+      "message": "The original operation is still in progress.",
+      "type": "conflict_error",
+      "param": null,
+      "code": "operation_in_progress"
+    }
+  },
+  "expected": {
+    "code": "operation_in_progress",
+    "code_recognized": true,
+    "class": "generic",
+    "retryable": false
+  }
+}

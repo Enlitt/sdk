@@ -1,0 +1,20 @@
+{
+  "description": "An unknown 5xx code remains retryable without a retry floor.",
+  "http_status": 503,
+  "headers": {},
+  "body": {
+    "error": {
+      "message": "A newer server returned this error.",
+      "type": "server_error",
+      "param": null,
+      "code": "future_server_error"
+    }
+  },
+  "expected": {
+    "code": "future_server_error",
+    "code_recognized": false,
+    "class": "generic",
+    "retryable": true,
+    "message": "Enlitt returned error code \"future_server_error\" (HTTP 503, type \"server_error\"), which this version of @enlitt/sdk does not recognize. Upgrade @enlitt/sdk to handle it. A newer server returned this error."
+  }
+}

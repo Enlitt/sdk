@@ -1,0 +1,14 @@
+{
+  "description": "Returns a reservation lowered to the authorized NANOUSD maximum.",
+  "endpoint": "begin-operation",
+  "http_status": 200,
+  "future": false,
+  "body": {
+    "operation_id": "op_fixture_2",
+    "billing": "managed",
+    "report_terminal": true,
+    "effective_max_charge_nano_usd": "500",
+    "reserved_nano_usd": "500",
+    "terminal_deadline": "2026-09-29T12:00:00Z"
+  }
+}

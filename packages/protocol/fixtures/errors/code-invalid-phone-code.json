@@ -1,0 +1,18 @@
+{
+  "description": "A bad SMS code uses one non-oracular dashboard refusal.",
+  "http_status": 400,
+  "headers": {},
+  "body": {
+    "error": {
+      "code": "invalid_phone_code",
+      "message": "The phone verification code is invalid."
+    },
+    "request_id": "req_fixture_invalid_phone_code"
+  },
+  "expected": {
+    "code": "invalid_phone_code",
+    "code_recognized": true,
+    "class": "generic",
+    "retryable": false
+  }
+}

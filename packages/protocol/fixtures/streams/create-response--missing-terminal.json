@@ -1,0 +1,47 @@
+{
+  "description": "Rejects a stream that ends without a terminal event.",
+  "endpoint": "create-response",
+  "future": false,
+  "events": [
+    {
+      "event": "response.created",
+      "data": {
+        "type": "response.created",
+        "sequence_number": 0,
+        "response": {
+          "id": "resp_stream_open",
+          "object": "response",
+          "created_at": 1760000000,
+          "status": "in_progress",
+          "error": null,
+          "incomplete_details": null,
+          "model": "enlitt-standard",
+          "output": [],
+          "metadata": {}
+        }
+      }
+    },
+    {
+      "event": "response.in_progress",
+      "data": {
+        "type": "response.in_progress",
+        "sequence_number": 1,
+        "response": {
+          "id": "resp_stream_open",
+          "object": "response",
+          "created_at": 1760000000,
+          "status": "in_progress",
+          "error": null,
+          "incomplete_details": null,
+          "model": "enlitt-standard",
+          "output": [],
+          "metadata": {}
+        }
+      }
+    }
+  ],
+  "expected": {
+    "outcome": "invalid",
+    "error_code": "malformed_response"
+  }
+}

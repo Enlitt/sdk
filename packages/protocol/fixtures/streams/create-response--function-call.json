@@ -1,0 +1,101 @@
+{
+  "description": "Streams one function call to a completed response.",
+  "endpoint": "create-response",
+  "future": false,
+  "events": [
+    {
+      "event": "response.created",
+      "data": {
+        "type": "response.created",
+        "sequence_number": 0,
+        "response": {
+          "id": "resp_stream_call",
+          "object": "response",
+          "created_at": 1760000000,
+          "status": "in_progress",
+          "error": null,
+          "incomplete_details": null,
+          "model": "enlitt-standard",
+          "output": [],
+          "metadata": {}
+        }
+      }
+    },
+    {
+      "event": "response.output_item.added",
+      "data": {
+        "type": "response.output_item.added",
+        "sequence_number": 1,
+        "output_index": 0,
+        "item": {
+          "type": "function_call",
+          "id": "fc_stream_call",
+          "call_id": "call_weather",
+          "name": "weather",
+          "arguments": "",
+          "status": "in_progress"
+        }
+      }
+    },
+    {
+      "event": "response.function_call_arguments.delta",
+      "data": {
+        "type": "response.function_call_arguments.delta",
+        "sequence_number": 2,
+        "item_id": "fc_stream_call",
+        "output_index": 0,
+        "delta": "{\"city\":"
+      }
+    },
+    {
+      "event": "response.function_call_arguments.delta",
+      "data": {
+        "type": "response.function_call_arguments.delta",
+        "sequence_number": 3,
+        "item_id": "fc_stream_call",
+        "output_index": 0,
+        "delta": "\"Boston\"}"
+      }
+    },
+    {
+      "event": "response.function_call_arguments.done",
+      "data": {
+        "type": "response.function_call_arguments.done",
+        "sequence_number": 4,
+        "item_id": "fc_stream_call",
+        "output_index": 0,
+        "arguments": "{\"city\":\"Boston\"}"
+      }
+    },
+    {
+      "event": "response.completed",
+      "data": {
+        "type": "response.completed",
+        "sequence_number": 5,
+        "response": {
+          "id": "resp_stream_call",
+          "object": "response",
+          "created_at": 1760000000,
+          "completed_at": 1760000001,
+          "status": "completed",
+          "error": null,
+          "incomplete_details": null,
+          "model": "enlitt-standard",
+          "output": [],
+          "metadata": {}
+        }
+      }
+    }
+  ],
+  "expected": {
+    "outcome": "completed",
+    "finish_reason": "tool-calls",
+    "function_calls": [
+      {
+        "call_id": "call_weather",
+        "name": "weather",
+        "arguments": "{\"city\":\"Boston\"}"
+      }
+    ]
+  }
+}

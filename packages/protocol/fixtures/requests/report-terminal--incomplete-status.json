@@ -1,0 +1,11 @@
+{
+  "description": "Rejects incomplete because it is not a reportable premium terminal status.",
+  "endpoint": "report-terminal",
+  "valid": false,
+  "error_param": "status",
+  "body": {
+    "report_id": "report-id-123456",
+    "status": "incomplete",
+    "charge_nano_usd": "0"
+  }
+}

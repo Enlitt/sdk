@@ -1,0 +1,14 @@
+{
+  "description": "Returns an admitted operation with NANOUSD reservation facts.",
+  "endpoint": "begin-operation",
+  "http_status": 200,
+  "future": false,
+  "body": {
+    "operation_id": "op_fixture_1",
+    "billing": "managed",
+    "report_terminal": true,
+    "effective_max_charge_nano_usd": "1000",
+    "reserved_nano_usd": "1000",
+    "terminal_deadline": "2026-09-29T12:00:00Z"
+  }
+}

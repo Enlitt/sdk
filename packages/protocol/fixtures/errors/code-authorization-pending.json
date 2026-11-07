@@ -1,0 +1,18 @@
+{
+  "description": "The developer has not yet approved or denied the CLI sign-in.",
+  "http_status": 400,
+  "headers": {},
+  "body": {
+    "error": {
+      "code": "authorization_pending",
+      "message": "Waiting for approval in the browser."
+    },
+    "request_id": "req_fixture_authorization_pending"
+  },
+  "expected": {
+    "code": "authorization_pending",
+    "code_recognized": true,
+    "class": "generic",
+    "retryable": false
+  }
+}

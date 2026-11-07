@@ -1,0 +1,16 @@
+{
+  "description": "Returns unmetered standard availability at one hundred percent.",
+  "endpoint": "usage",
+  "http_status": 200,
+  "future": false,
+  "body": {
+    "standard": {
+      "remaining_percent": 100,
+      "limit_cap_nano_usd": "1000"
+    },
+    "premium": {
+      "remaining_percent": 0,
+      "limit_cap_nano_usd": "0"
+    }
+  }
+}

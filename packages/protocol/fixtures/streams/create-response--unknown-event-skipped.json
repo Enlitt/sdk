@@ -1,0 +1,56 @@
+{
+  "description": "Keeps a future event in sequence while an older reader skips its payload.",
+  "endpoint": "create-response",
+  "future": true,
+  "events": [
+    {
+      "event": "response.created",
+      "data": {
+        "type": "response.created",
+        "sequence_number": 0,
+        "response": {
+          "id": "resp_stream_future",
+          "object": "response",
+          "created_at": 1760000000,
+          "status": "in_progress",
+          "error": null,
+          "incomplete_details": null,
+          "model": "enlitt-standard",
+          "output": [],
+          "metadata": {}
+        }
+      }
+    },
+    {
+      "event": "response.reasoning.delta",
+      "data": {
+        "type": "response.reasoning.delta",
+        "sequence_number": 1,
+        "delta": "ignored"
+      }
+    },
+    {
+      "event": "response.completed",
+      "data": {
+        "type": "response.completed",
+        "sequence_number": 2,
+        "response": {
+          "id": "resp_stream_future",
+          "object": "response",
+          "created_at": 1760000000,
+          "completed_at": 1760000001,
+          "status": "completed",
+          "error": null,
+          "incomplete_details": null,
+          "model": "enlitt-standard",
+          "output": [],
+          "metadata": {}
+        }
+      }
+    }
+  ],
+  "expected": {
+    "outcome": "completed",
+    "finish_reason": "stop"
+  }
+}

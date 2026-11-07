@@ -1,0 +1,49 @@
+{
+  "description": "Ends a stream as incomplete when output reaches its length limit.",
+  "endpoint": "create-response",
+  "future": false,
+  "events": [
+    {
+      "event": "response.created",
+      "data": {
+        "type": "response.created",
+        "sequence_number": 0,
+        "response": {
+          "id": "resp_stream_length",
+          "object": "response",
+          "created_at": 1760000000,
+          "status": "in_progress",
+          "error": null,
+          "incomplete_details": null,
+          "model": "enlitt-standard",
+          "output": [],
+          "metadata": {}
+        }
+      }
+    },
+    {
+      "event": "response.incomplete",
+      "data": {
+        "type": "response.incomplete",
+        "sequence_number": 1,
+        "response": {
+          "id": "resp_stream_length",
+          "object": "response",
+          "created_at": 1760000000,
+          "status": "incomplete",
+          "error": null,
+          "incomplete_details": {
+            "reason": "max_output_tokens"
+          },
+          "model": "enlitt-standard",
+          "output": [],
+          "metadata": {}
+        }
+      }
+    }
+  ],
+  "expected": {
+    "outcome": "incomplete",
+    "finish_reason": "length"
+  }
+}

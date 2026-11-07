@@ -1,0 +1,88 @@
+{
+  "description": "Reads a future payout status as the reserved other value.",
+  "endpoint": "business-info",
+  "http_status": 200,
+  "future": true,
+  "body": {
+    "business": {
+      "id": "biz_fixture_1",
+      "name": "Fixture Business"
+    },
+    "earnings": {
+      "earnings_nano_usd": "700",
+      "payout_pending_nano_usd": "0",
+      "display_currency": "USD"
+    },
+    "payout": {
+      "eligible": true,
+      "connected_account_status": "verifying",
+      "policy_code_version": "2026-09-29",
+      "minimum_available_nano_usd": "50000000000",
+      "next_eligible_at": null
+    },
+    "traffic": {
+      "daily_visitors": [],
+      "daily_usage": [],
+      "usage": {
+        "standard": {
+          "requests": 0,
+          "used_nano_usd": "0"
+        },
+        "premium": {
+          "requests": 1,
+          "used_nano_usd": "700",
+          "earnings_nano_usd": "700"
+        }
+      }
+    },
+    "applications": [],
+    "next_cursor": null,
+    "range": {
+      "from": "2026-09-01T00:00:00Z",
+      "to": "2026-09-29T00:00:00Z",
+      "timezone": "UTC"
+    },
+    "data_fresh_at": "2026-09-29T00:00:00Z"
+  },
+  "expected_tolerant": {
+    "business": {
+      "id": "biz_fixture_1",
+      "name": "Fixture Business"
+    },
+    "earnings": {
+      "earnings_nano_usd": "700",
+      "payout_pending_nano_usd": "0",
+      "display_currency": "USD"
+    },
+    "payout": {
+      "eligible": true,
+      "connected_account_status": "other",
+      "policy_code_version": "2026-09-29",
+      "minimum_available_nano_usd": "50000000000",
+      "next_eligible_at": null
+    },
+    "traffic": {
+      "daily_visitors": [],
+      "daily_usage": [],
+      "usage": {
+        "standard": {
+          "requests": 0,
+          "used_nano_usd": "0"
+        },
+        "premium": {
+          "requests": 1,
+          "used_nano_usd": "700",
+          "earnings_nano_usd": "700"
+        }
+      }
+    },
+    "applications": [],
+    "next_cursor": null,
+    "range": {
+      "from": "2026-09-01T00:00:00Z",
+      "to": "2026-09-29T00:00:00Z",
+      "timezone": "UTC"
+    },
+    "data_fresh_at": "2026-09-29T00:00:00Z"
+  }
+}

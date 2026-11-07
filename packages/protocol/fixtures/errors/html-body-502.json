@@ -1,0 +1,12 @@
+{
+  "description": "A non-envelope HTML gateway body is malformed rather than retryable.",
+  "http_status": 502,
+  "headers": {},
+  "body": "<html><body>Bad Gateway</body></html>",
+  "expected": {
+    "code": "malformed_response",
+    "code_recognized": false,
+    "class": "generic",
+    "retryable": false
+  }
+}

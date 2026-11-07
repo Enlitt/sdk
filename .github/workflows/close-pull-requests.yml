@@ -1,0 +1,23 @@
+# This repository is a read-only mirror, so every pull request is closed with a pointer to issues.
+# pull_request_target runs with this repository's token and never checks out the pull request's
+# code, so nothing a contributor submits is ever executed.
+name: Close pull requests
+
+on:
+  pull_request_target:
+    types: [opened, reopened]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  close:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Close with a comment
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh pr close "$NUMBER" --repo "$REPO" --comment "Thanks for the contribution! This repository is a read-only mirror of Enlitt's private repository, so pull requests can't be merged here. Please open an issue describing the change instead; we apply fixes upstream and they appear here on the next sync."

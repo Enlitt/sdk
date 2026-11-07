@@ -1,0 +1,28 @@
+{
+  "description": "Reads a future response status as the reserved other value.",
+  "endpoint": "create-response",
+  "http_status": 200,
+  "future": true,
+  "body": {
+    "id": "resp_fixture_2",
+    "object": "response",
+    "created_at": 1760000000,
+    "status": "paused",
+    "error": null,
+    "incomplete_details": null,
+    "model": "enlitt-standard",
+    "output": [],
+    "metadata": {}
+  },
+  "expected_tolerant": {
+    "id": "resp_fixture_2",
+    "object": "response",
+    "created_at": 1760000000,
+    "status": "other",
+    "error": null,
+    "incomplete_details": null,
+    "model": "enlitt-standard",
+    "output": [],
+    "metadata": {}
+  }
+}

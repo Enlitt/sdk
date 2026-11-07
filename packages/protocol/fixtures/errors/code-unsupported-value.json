@@ -1,0 +1,19 @@
+{
+  "description": "An unsupported member of an accepted field is refused.",
+  "http_status": 400,
+  "headers": {},
+  "body": {
+    "error": {
+      "message": "This field value is not supported.",
+      "type": "invalid_request_error",
+      "param": "input[0].type",
+      "code": "unsupported_value"
+    }
+  },
+  "expected": {
+    "code": "unsupported_value",
+    "code_recognized": true,
+    "class": "generic",
+    "retryable": false
+  }
+}

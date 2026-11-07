@@ -1,0 +1,18 @@
+{
+  "description": "The developer denied the CLI sign-in in the browser.",
+  "http_status": 400,
+  "headers": {},
+  "body": {
+    "error": {
+      "code": "access_denied",
+      "message": "The request was denied in the browser."
+    },
+    "request_id": "req_fixture_access_denied"
+  },
+  "expected": {
+    "code": "access_denied",
+    "code_recognized": true,
+    "class": "generic",
+    "retryable": false
+  }
+}

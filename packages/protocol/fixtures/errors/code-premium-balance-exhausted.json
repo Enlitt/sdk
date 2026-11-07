@@ -1,0 +1,25 @@
+{
+  "description": "A premium balance refusal gives the admissible NANOUSD maximum.",
+  "http_status": 403,
+  "headers": {},
+  "body": {
+    "error": {
+      "message": "The remaining premium capacity cannot cover this maximum.",
+      "type": "insufficient_credits_error",
+      "param": null,
+      "code": "premium_balance_exhausted",
+      "enlitt": {
+        "authorize_url": "https://dashboard.enlitt.com/authorize",
+        "admissible_max_charge_nano_usd": "800000"
+      }
+    }
+  },
+  "expected": {
+    "code": "premium_balance_exhausted",
+    "code_recognized": true,
+    "class": "insufficient_credits",
+    "retryable": false,
+    "authorize_url": "https://dashboard.enlitt.com/authorize",
+    "admissible_max_charge_nano_usd": "800000"
+  }
+}

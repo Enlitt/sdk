@@ -1,0 +1,24 @@
+{
+  "description": "An unknown credit refusal retains its safe authorization link.",
+  "http_status": 403,
+  "headers": {},
+  "body": {
+    "error": {
+      "message": "A newer spending rule refused this call.",
+      "type": "insufficient_credits_error",
+      "param": null,
+      "code": "future_credit_refusal",
+      "enlitt": {
+        "authorize_url": "https://dashboard.enlitt.com/authorize"
+      }
+    }
+  },
+  "expected": {
+    "code": "future_credit_refusal",
+    "code_recognized": false,
+    "class": "insufficient_credits",
+    "retryable": false,
+    "authorize_url": "https://dashboard.enlitt.com/authorize",
+    "message": "Enlitt returned error code \"future_credit_refusal\" (HTTP 403, type \"insufficient_credits_error\"), which this version of @enlitt/sdk does not recognize. Upgrade @enlitt/sdk to handle it. A newer spending rule refused this call."
+  }
+}

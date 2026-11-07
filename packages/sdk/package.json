@@ -1,0 +1,142 @@
+{
+  "name": "@enlitt/sdk",
+  "version": "0.1.0",
+  "description": "Official TypeScript SDK for Enlitt",
+  "homepage": "https://enlitt.com/docs",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/enlitt/sdk.git",
+    "directory": "packages/sdk"
+  },
+  "bugs": {
+    "url": "https://github.com/enlitt/sdk/issues"
+  },
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./browser": {
+      "import": {
+        "types": "./dist/browser.d.ts",
+        "default": "./dist/browser.js"
+      },
+      "require": {
+        "types": "./dist/browser.d.cts",
+        "default": "./dist/browser.cjs"
+      }
+    },
+    "./core": {
+      "browser": "./dist/server-unavailable.js",
+      "import": {
+        "types": "./dist/core/index.d.ts",
+        "default": "./dist/core.js"
+      },
+      "require": {
+        "types": "./dist/core/index.d.cts",
+        "default": "./dist/core.cjs"
+      }
+    },
+    "./vercel": {
+      "browser": "./dist/server-unavailable.js",
+      "import": {
+        "types": "./dist/vercel/index.d.ts",
+        "default": "./dist/vercel.js"
+      },
+      "require": {
+        "types": "./dist/vercel/index.d.cts",
+        "default": "./dist/vercel.cjs"
+      }
+    },
+    "./openai": {
+      "browser": "./dist/server-unavailable.js",
+      "import": {
+        "types": "./dist/openai/index.d.ts",
+        "default": "./dist/openai.js"
+      },
+      "require": {
+        "types": "./dist/openai/index.d.cts",
+        "default": "./dist/openai.cjs"
+      }
+    },
+    "./server": {
+      "browser": "./dist/server-unavailable.js",
+      "import": {
+        "types": "./dist/server/index.d.ts",
+        "default": "./dist/server.js"
+      },
+      "require": {
+        "types": "./dist/server/index.d.cts",
+        "default": "./dist/server.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "tsup --watch",
+    "build": "tsup && tsc -p tsconfig.build.json && node scripts/emit-cts-declarations.mjs",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:package": "rm -rf .pack && pnpm --config.ignore-scripts=true pack --pack-destination .pack > /dev/null && publint .pack/*.tgz && attw .pack/*.tgz --profile node16",
+    "prepack": "pnpm build && pnpm test:package"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@ai-sdk/provider": "4.0.10",
+    "@arethetypeswrong/cli": "^0.18.5",
+    "@types/node": "^24.13.3",
+    "openai": "7.27.0",
+    "publint": "^0.3.25",
+    "tsup": "^8.5.1",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.11"
+  },
+  "dependencies": {
+    "@enlitt/protocol": "workspace:*"
+  },
+  "peerDependencies": {
+    "openai": "^7.27.0"
+  },
+  "typesVersions": {
+    "*": {
+      "browser": [
+        "dist/browser.d.ts"
+      ],
+      "core": [
+        "dist/core/index.d.ts"
+      ],
+      "vercel": [
+        "dist/vercel/index.d.ts"
+      ],
+      "openai": [
+        "dist/openai/index.d.ts"
+      ],
+      "server": [
+        "dist/server/index.d.ts"
+      ]
+    }
+  }
+}

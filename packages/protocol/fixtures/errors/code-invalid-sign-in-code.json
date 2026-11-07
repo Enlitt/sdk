@@ -1,0 +1,18 @@
+{
+  "description": "A bad email sign-in code is indistinguishable from an expired one.",
+  "http_status": 400,
+  "headers": {},
+  "body": {
+    "error": {
+      "code": "invalid_sign_in_code",
+      "message": "The sign-in code is invalid."
+    },
+    "request_id": "req_fixture_sign_in_code"
+  },
+  "expected": {
+    "code": "invalid_sign_in_code",
+    "code_recognized": true,
+    "class": "generic",
+    "retryable": false
+  }
+}

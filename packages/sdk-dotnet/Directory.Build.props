@@ -1,0 +1,19 @@
+<Project>
+  <!-- Settings shared by every project in the .NET SDK workspace. -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <!-- The one package version. SdkVersion.Value must equal it; VersionTests proves that. -->
+    <Version>0.1.0</Version>
+    <Authors>Enlitt</Authors>
+    <Company>Enlitt</Company>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://enlitt.com/docs</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/enlitt/sdk</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+</Project>

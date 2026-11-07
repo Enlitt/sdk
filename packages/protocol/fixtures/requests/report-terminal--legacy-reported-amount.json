@@ -1,0 +1,12 @@
+{
+  "description": "Rejects the legacy reported NANOUSD amount field.",
+  "endpoint": "report-terminal",
+  "valid": false,
+  "error_param": "reported_nano_usd",
+  "body": {
+    "report_id": "report-id-123456",
+    "status": "completed",
+    "charge_nano_usd": "0",
+    "reported_nano_usd": "1000"
+  }
+}

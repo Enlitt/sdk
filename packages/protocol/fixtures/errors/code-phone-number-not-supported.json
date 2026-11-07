@@ -1,0 +1,18 @@
+{
+  "description": "An unsupported phone number reports a bounded input error.",
+  "http_status": 400,
+  "headers": {},
+  "body": {
+    "error": {
+      "code": "phone_number_not_supported",
+      "message": "This phone number cannot be used."
+    },
+    "request_id": "req_fixture_phone_not_supported"
+  },
+  "expected": {
+    "code": "phone_number_not_supported",
+    "code_recognized": true,
+    "class": "generic",
+    "retryable": false
+  }
+}

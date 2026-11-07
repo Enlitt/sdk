@@ -1,0 +1,21 @@
+{
+  "description": "Rejects an unknown request field.",
+  "endpoint": "create-response",
+  "valid": false,
+  "error_param": "future_field",
+  "body": {
+    "model": "enlitt-standard",
+    "messages": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "type": "text",
+            "text": "Hello"
+          }
+        ]
+      }
+    ],
+    "future_field": true
+  }
+}

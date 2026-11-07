@@ -1,0 +1,16 @@
+{
+  "description": "Returns a settled terminal report whose captured and released NANOUSD sum to its reservation.",
+  "endpoint": "report-terminal",
+  "http_status": 200,
+  "future": false,
+  "body": {
+    "operation_id": "op_fixture_1",
+    "status": "completed",
+    "idempotent_replay": false,
+    "settlement": {
+      "captured_nano_usd": "700",
+      "released_nano_usd": "300",
+      "business_earnings_nano_usd": "700"
+    }
+  }
+}

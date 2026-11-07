@@ -1,0 +1,18 @@
+{
+  "description": "A business name held by another business is unavailable.",
+  "http_status": 409,
+  "headers": {},
+  "body": {
+    "error": {
+      "code": "business_name_unavailable",
+      "message": "This business name is unavailable."
+    },
+    "request_id": "req_fixture_business_name_unavailable"
+  },
+  "expected": {
+    "code": "business_name_unavailable",
+    "code_recognized": true,
+    "class": "generic",
+    "retryable": false
+  }
+}

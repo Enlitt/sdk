@@ -1,0 +1,13 @@
+{
+  "description": "Begins a managed operation with a positive NANOUSD maximum.",
+  "endpoint": "begin-operation",
+  "valid": true,
+  "body": {
+    "mode": "premium",
+    "max_charge_nano_usd": "1000",
+    "provider": {
+      "id": "openai",
+      "model": "gpt-5"
+    }
+  }
+}

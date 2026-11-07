@@ -1,0 +1,56 @@
+{
+  "description": "Rejects a reordered sequence that runs through a future event.",
+  "endpoint": "create-response",
+  "future": true,
+  "events": [
+    {
+      "event": "response.created",
+      "data": {
+        "type": "response.created",
+        "sequence_number": 0,
+        "response": {
+          "id": "resp_stream_gap",
+          "object": "response",
+          "created_at": 1760000000,
+          "status": "in_progress",
+          "error": null,
+          "incomplete_details": null,
+          "model": "enlitt-standard",
+          "output": [],
+          "metadata": {}
+        }
+      }
+    },
+    {
+      "event": "response.reasoning.delta",
+      "data": {
+        "type": "response.reasoning.delta",
+        "sequence_number": 2,
+        "delta": "ignored"
+      }
+    },
+    {
+      "event": "response.completed",
+      "data": {
+        "type": "response.completed",
+        "sequence_number": 1,
+        "response": {
+          "id": "resp_stream_gap",
+          "object": "response",
+          "created_at": 1760000000,
+          "completed_at": 1760000001,
+          "status": "completed",
+          "error": null,
+          "incomplete_details": null,
+          "model": "enlitt-standard",
+          "output": [],
+          "metadata": {}
+        }
+      }
+    }
+  ],
+  "expected": {
+    "outcome": "invalid",
+    "error_code": "malformed_response"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "description": "Reports a completed premium operation with its charge.",
+  "endpoint": "report-terminal",
+  "valid": true,
+  "body": {
+    "report_id": "report-id-123456",
+    "status": "completed",
+    "charge_nano_usd": "700"
+  }
+}

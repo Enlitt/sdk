@@ -1,0 +1,50 @@
+{
+  "description": "Ends a stream as failed after a provider error.",
+  "endpoint": "create-response",
+  "future": false,
+  "events": [
+    {
+      "event": "response.created",
+      "data": {
+        "type": "response.created",
+        "sequence_number": 0,
+        "response": {
+          "id": "resp_stream_failed",
+          "object": "response",
+          "created_at": 1760000000,
+          "status": "in_progress",
+          "error": null,
+          "incomplete_details": null,
+          "model": "enlitt-standard",
+          "output": [],
+          "metadata": {}
+        }
+      }
+    },
+    {
+      "event": "response.failed",
+      "data": {
+        "type": "response.failed",
+        "sequence_number": 1,
+        "response": {
+          "id": "resp_stream_failed",
+          "object": "response",
+          "created_at": 1760000000,
+          "status": "failed",
+          "error": {
+            "code": "provider_error",
+            "message": "Provider failed"
+          },
+          "incomplete_details": null,
+          "model": "enlitt-standard",
+          "output": [],
+          "metadata": {}
+        }
+      }
+    }
+  ],
+  "expected": {
+    "outcome": "failed",
+    "finish_reason": "error"
+  }
+}

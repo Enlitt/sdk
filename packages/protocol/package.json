@@ -1,0 +1,64 @@
+{
+  "name": "@enlitt/protocol",
+  "version": "0.1.0",
+  "description": "Versioned runtime schemas and wire types for Enlitt",
+  "homepage": "https://enlitt.com/docs",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/enlitt/sdk.git",
+    "directory": "packages/protocol"
+  },
+  "bugs": {
+    "url": "https://github.com/enlitt/sdk/issues"
+  },
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "generated",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./contract.json": "./generated/contract.json",
+    "./package.json": "./package.json"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "tsup --watch",
+    "build": "tsup && tsc -p tsconfig.build.json && node scripts/emit-cts-declarations.mjs",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "generate:contract": "vitest run tests/contract.test.ts --update",
+    "test:package": "rm -rf .pack && pnpm --config.ignore-scripts=true pack --pack-destination .pack > /dev/null && publint .pack/*.tgz && attw .pack/*.tgz --profile node16",
+    "prepack": "pnpm build && pnpm test:package"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
+    "@types/node": "^24.10.1",
+    "publint": "^0.3.25",
+    "tsup": "^8.5.0",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.11"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

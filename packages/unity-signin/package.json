@@ -1,0 +1,11 @@
+{
+  "name": "@enlitt/unity-signin",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Unity sign-in kit (UPM com.enlitt.signin). A pnpm wrapper so the repo's checks reach the dotnet tests; the UPM package itself is upm/.",
+  "scripts": {
+    "test": "sh ../../tools/dotnet.sh test tests/Enlitt.SignIn.Tests",
+    "lint": "sh ../../tools/dotnet.sh format tests/Enlitt.SignIn.Tests --verify-no-changes && sh ../../tools/dotnet.sh format tests/UnityCompileCheck --verify-no-changes",
+    "typecheck": "sh ../../tools/dotnet.sh build -warnaserror tests/Enlitt.SignIn.Tests && sh ../../tools/dotnet.sh build -warnaserror tests/UnityCompileCheck"
+  }
+}

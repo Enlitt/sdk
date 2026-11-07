@@ -1,0 +1,23 @@
+{
+  "description": "An exceptional subscription gap refuses the call.",
+  "http_status": 403,
+  "headers": {},
+  "body": {
+    "error": {
+      "message": "No active subscription period covers this call.",
+      "type": "insufficient_credits_error",
+      "param": null,
+      "code": "subscription_inactive",
+      "enlitt": {
+        "authorize_url": "https://dashboard.enlitt.com/authorize"
+      }
+    }
+  },
+  "expected": {
+    "code": "subscription_inactive",
+    "code_recognized": true,
+    "class": "subscription_inactive",
+    "retryable": false,
+    "authorize_url": "https://dashboard.enlitt.com/authorize"
+  }
+}

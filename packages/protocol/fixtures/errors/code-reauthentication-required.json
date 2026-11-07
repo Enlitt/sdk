@@ -1,0 +1,18 @@
+{
+  "description": "A stale dashboard session requires reauthentication.",
+  "http_status": 401,
+  "headers": {},
+  "body": {
+    "error": {
+      "code": "reauthentication_required",
+      "message": "Reauthentication is required for this action."
+    },
+    "request_id": "req_fixture_reauthentication"
+  },
+  "expected": {
+    "code": "reauthentication_required",
+    "code_recognized": true,
+    "class": "generic",
+    "retryable": false
+  }
+}

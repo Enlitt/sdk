@@ -1,0 +1,18 @@
+{
+  "description": "An unknown, expired, or already exchanged device code all answer the same way.",
+  "http_status": 400,
+  "headers": {},
+  "body": {
+    "error": {
+      "code": "expired_token",
+      "message": "The device code is invalid or has expired."
+    },
+    "request_id": "req_fixture_expired_token"
+  },
+  "expected": {
+    "code": "expired_token",
+    "code_recognized": true,
+    "class": "generic",
+    "retryable": false
+  }
+}

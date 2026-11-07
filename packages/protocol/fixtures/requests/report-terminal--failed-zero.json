@@ -1,0 +1,10 @@
+{
+  "description": "Reports a failed premium operation with zero charge.",
+  "endpoint": "report-terminal",
+  "valid": true,
+  "body": {
+    "report_id": "report-id-123456",
+    "status": "failed",
+    "charge_nano_usd": "0"
+  }
+}

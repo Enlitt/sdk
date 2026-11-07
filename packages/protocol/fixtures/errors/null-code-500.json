@@ -1,0 +1,20 @@
+{
+  "description": "A null envelope code uses the reserved unrecognized identifier.",
+  "http_status": 500,
+  "headers": {},
+  "body": {
+    "error": {
+      "message": "The server returned no usable code.",
+      "type": "server_error",
+      "param": null,
+      "code": null
+    }
+  },
+  "expected": {
+    "code": "unrecognized",
+    "code_recognized": false,
+    "class": "generic",
+    "retryable": true,
+    "message": "Enlitt returned error code \"unrecognized\" (HTTP 500, type \"server_error\"), which this version of @enlitt/sdk does not recognize. Upgrade @enlitt/sdk to handle it. The server returned no usable code."
+  }
+}

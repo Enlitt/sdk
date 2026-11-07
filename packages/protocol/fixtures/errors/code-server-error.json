@@ -1,0 +1,19 @@
+{
+  "description": "An internal error is retryable without a retry floor.",
+  "http_status": 500,
+  "headers": {},
+  "body": {
+    "error": {
+      "message": "An internal error occurred.",
+      "type": "server_error",
+      "param": null,
+      "code": "server_error"
+    }
+  },
+  "expected": {
+    "code": "server_error",
+    "code_recognized": true,
+    "class": "generic",
+    "retryable": true
+  }
+}

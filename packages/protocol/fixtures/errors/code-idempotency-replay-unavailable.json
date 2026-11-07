@@ -1,0 +1,19 @@
+{
+  "description": "A terminal operation cannot be replayed through its idempotency key.",
+  "http_status": 409,
+  "headers": {},
+  "body": {
+    "error": {
+      "message": "The original operation has already reached a terminal state.",
+      "type": "conflict_error",
+      "param": null,
+      "code": "idempotency_replay_unavailable"
+    }
+  },
+  "expected": {
+    "code": "idempotency_replay_unavailable",
+    "code_recognized": true,
+    "class": "generic",
+    "retryable": false
+  }
+}

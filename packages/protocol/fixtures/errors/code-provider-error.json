@@ -1,0 +1,19 @@
+{
+  "description": "A provider failure is retryable without exposing provider details.",
+  "http_status": 502,
+  "headers": {},
+  "body": {
+    "error": {
+      "message": "The selected provider failed.",
+      "type": "server_error",
+      "param": null,
+      "code": "provider_error"
+    }
+  },
+  "expected": {
+    "code": "provider_error",
+    "code_recognized": true,
+    "class": "generic",
+    "retryable": true
+  }
+}

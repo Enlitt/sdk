@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <PackageId>Enlitt</PackageId>
+    <Description>Enlitt SDK for .NET: sessions, standard and premium model accounting, usage, and sign-in handlers.</Description>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- The vendored wire contract (sync:contract refreshes it). -->
+    <EmbeddedResource Include="contract.json" LogicalName="Enlitt.contract.json" />
+    <None Include="../../README.md" Pack="true" PackagePath="/" />
+    <InternalsVisibleTo Include="Enlitt.Tests" />
+    <InternalsVisibleTo Include="Enlitt.AspNetCore" />
+    <InternalsVisibleTo Include="Enlitt.Extensions.AI" />
+    <InternalsVisibleTo Include="StagingDriver" />
+  </ItemGroup>
+</Project>

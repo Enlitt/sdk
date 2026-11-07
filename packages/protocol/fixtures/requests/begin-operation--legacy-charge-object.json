@@ -1,0 +1,16 @@
+{
+  "description": "Rejects the legacy charge object.",
+  "endpoint": "begin-operation",
+  "valid": false,
+  "error_param": "charge",
+  "body": {
+    "mode": "premium",
+    "charge": {
+      "amount": "1000"
+    },
+    "provider": {
+      "id": "openai",
+      "model": "gpt-5"
+    }
+  }
+}

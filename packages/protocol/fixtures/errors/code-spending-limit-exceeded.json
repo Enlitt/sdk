@@ -1,0 +1,25 @@
+{
+  "description": "An authorization spending rule refuses a reservation.",
+  "http_status": 403,
+  "headers": {},
+  "body": {
+    "error": {
+      "message": "The authorization spending rule refused this reservation.",
+      "type": "insufficient_credits_error",
+      "param": null,
+      "code": "spending_limit_exceeded",
+      "enlitt": {
+        "authorize_url": "https://dashboard.enlitt.com/authorize",
+        "limit_rule": "rate.premium"
+      }
+    }
+  },
+  "expected": {
+    "code": "spending_limit_exceeded",
+    "code_recognized": true,
+    "class": "limit_exceeded",
+    "retryable": false,
+    "authorize_url": "https://dashboard.enlitt.com/authorize",
+    "limit_rule": "rate.premium"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "description": "Begins a managed operation that can charge nothing.",
+  "endpoint": "begin-operation",
+  "valid": true,
+  "body": {
+    "mode": "premium",
+    "max_charge_nano_usd": "0",
+    "provider": {
+      "id": "openai",
+      "model": "gpt-5"
+    }
+  }
+}

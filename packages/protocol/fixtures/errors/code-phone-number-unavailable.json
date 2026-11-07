@@ -1,0 +1,18 @@
+{
+  "description": "A proved phone number held by another account is unavailable.",
+  "http_status": 409,
+  "headers": {},
+  "body": {
+    "error": {
+      "code": "phone_number_unavailable",
+      "message": "This phone number is unavailable."
+    },
+    "request_id": "req_fixture_phone_unavailable"
+  },
+  "expected": {
+    "code": "phone_number_unavailable",
+    "code_recognized": true,
+    "class": "generic",
+    "retryable": false
+  }
+}
