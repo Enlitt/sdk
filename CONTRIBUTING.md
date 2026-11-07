@@ -10,5 +10,5 @@ Your feedback is still very welcome:
 - **Feature request or question:** open an issue describing what you are trying to build.
 - **Security problem:** follow [SECURITY.md](SECURITY.md) instead of opening an issue.
 
-If an issue includes a suggested fix, we will apply it upstream and it will appear here on the
-next sync.
+If an issue includes a suggested fix, we will apply it upstream and it will appear here with the
+next release.

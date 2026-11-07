@@ -25,9 +25,10 @@ and pin a version by appending a tag, for example `#unity-signin-v0.1.0`.
 ## About this repository
 
 This is a read-only mirror. The packages are developed in Enlitt's private repository and copied
-here automatically on every change, so each commit here is one sync rather than the original
-history. The mirror holds the package sources only, not the workspace that builds them; install
-the published packages above to use them.
+here with every release, so each commit here is one release rather than the original history.
+Each release is tagged `<package>-v<version>` (for example `sdk-v0.1.1`). The mirror holds the
+package sources only, not the workspace that builds them; install the published packages above to
+use them.
 
 - Bugs and questions: [open an issue](https://github.com/enlitt/sdk/issues).
 - Security problems: see [SECURITY.md](SECURITY.md). Please do not open a public issue.
