@@ -54,7 +54,7 @@ import { getEnlittSession, type EnlittSession } from "./session.js";
  * this module has no other reason to make. It must be bumped by hand
  * alongside `package.json`'s `version` field.
  */
-export const SDK_VERSION = "0.1.0";
+export const SDK_VERSION = "0.1.1";
 
 /** Hosts `http:` is still accepted for, matching a developer's own machine. */
 const LOCAL_HTTP_HOSTS: ReadonlySet<string> = new Set(["localhost", "127.0.0.1", "[::1]"]);

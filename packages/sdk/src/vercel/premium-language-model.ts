@@ -158,12 +158,13 @@ export function createPremiumLanguageModel(client: InternalEnlittClient, model: 
  *   result or stream is unaffected.
  *
  * It never lowers the result to the effective maximum: that is the core's rule,
- * applied when it reports.
+ * applied when it reports. Generic over the context so the media wrappers
+ * (`premium-media-model.ts`) share this one rule rather than copying it.
  */
-async function evaluatePrice(
+export async function evaluatePrice<Context = PremiumPriceContext>(
   client: InternalEnlittClient,
-  price: EnlittPrice | undefined,
-  context: PremiumPriceContext
+  price: string | ((context: Context) => string | Promise<string>) | undefined,
+  context: Context
 ): Promise<string> {
   if (price === undefined) {
     return "0";
@@ -472,7 +473,7 @@ function wrapStream(
 // --- Small shared helpers ----------------------------------------------------
 
 /** The content-free timing bracket as the wire reports it. */
-function timingFacts(startedAt: Date, endedAt: Date): { startedAt: string; endedAt: string } {
+export function timingFacts(startedAt: Date, endedAt: Date): { startedAt: string; endedAt: string } {
   return { startedAt: startedAt.toISOString(), endedAt: endedAt.toISOString() };
 }
 

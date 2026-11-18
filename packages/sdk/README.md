@@ -46,7 +46,7 @@ existing callers can omit the hook, and older SDKs ignore the added field.
 | Import               | Purpose                                                 |
 | -------------------- | ------------------------------------------------------- |
 | `@enlitt/sdk/vercel` | Vercel AI SDK model wrapping and pricing.               |
-| `@enlitt/sdk/openai` | Official OpenAI `responses.create()` adapter.           |
+| `@enlitt/sdk/openai` | Official OpenAI Responses, images, and audio adapter.   |
 | `@enlitt/sdk/core`   | Sessions, errors, `usage()`, and `withPremiumCharge()`. |
 | `@enlitt/sdk/server` | Login handlers and core/Vercel compatibility exports.   |
 
@@ -54,6 +54,8 @@ All four entries are server-only. The root and browser entries currently
 export no integration APIs. Never put a business key in browser code.
 
 Premium pricing uses exact NANOUSD strings with `maxCharge` and `price`.
+Premium also wraps image, speech, and transcription models (`perImage`,
+`perCharacter`, and `perAudioSecond` price them); there is no standard media model.
 Test applications consume real credits.
 
 Read the [developer guide](https://enlitt.com/docs), starting with

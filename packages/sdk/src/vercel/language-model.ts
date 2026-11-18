@@ -1,4 +1,5 @@
 import type {
+  ImageModelV3,
   LanguageModelV3,
   LanguageModelV3CallOptions,
   LanguageModelV3Content,
@@ -6,7 +7,9 @@ import type {
   LanguageModelV3StreamPart,
   LanguageModelV3Usage,
   SharedV3ProviderMetadata,
-  SharedV3ProviderOptions
+  SharedV3ProviderOptions,
+  SpeechModelV3,
+  TranscriptionModelV3
 } from "@ai-sdk/provider";
 import { ENLITT_STANDARD_MODEL } from "@enlitt/protocol";
 import { EnlittConfigurationError } from "../core/errors.js";
@@ -21,6 +24,7 @@ import {
 import { createInternalClient, type EnlittOptions } from "../core/transport.js";
 import { createStandardLanguageModel } from "./standard-language-model.js";
 import { createPremiumLanguageModel } from "./premium-language-model.js";
+import { createPremiumMediaModel } from "./premium-media-model.js";
 
 /**
  * The only standard model string. There is no second public factory, client
@@ -44,7 +48,9 @@ export type EnlittTarget = typeof ENLITT_STANDARD_MODEL | LanguageModelV3;
  *
  * `enlitt("enlitt-standard")` returns Enlitt's own standard model;
  * `enlitt(myProviderModel)` returns transparent middleware around it in
- * premium mode. Both modes require the business's application secret, resolved
+ * premium mode. A provider model may be a language, image, speech, or
+ * transcription model, and the result has the same interface as the model
+ * passed in; standard is a language model only. Both modes require the business's application secret, resolved
  * once here by `createInternalClient()`, which also asserts a server runtime
  * (before any secret is touched) and resolves and validates the base URL once.
  * A missing or invalid secret is an `EnlittConfigurationError` thrown before the
@@ -57,13 +63,48 @@ export type EnlittTarget = typeof ENLITT_STANDARD_MODEL | LanguageModelV3;
  * model it returns. `EnlittOptions` is declared once, in core, and shared with
  * `withPremiumCharge()` and `usage()`.
  */
-export function enlitt(target: EnlittTarget, options: EnlittOptions = {}): LanguageModelV3 {
+export function enlitt(target: EnlittTarget, options?: EnlittOptions): LanguageModelV3;
+export function enlitt(target: ImageModelV3, options?: EnlittOptions): ImageModelV3;
+export function enlitt(target: SpeechModelV3, options?: EnlittOptions): SpeechModelV3;
+export function enlitt(target: TranscriptionModelV3, options?: EnlittOptions): TranscriptionModelV3;
+export function enlitt(
+  target: EnlittTarget | ImageModelV3 | SpeechModelV3 | TranscriptionModelV3,
+  options: EnlittOptions = {}
+): LanguageModelV3 | ImageModelV3 | SpeechModelV3 | TranscriptionModelV3 {
   const client = createInternalClient(options);
 
   if (target === ENLITT_STANDARD_MODEL) {
     return createStandardLanguageModel(client);
   }
-  return createPremiumLanguageModel(client, target);
+
+  // The four `v3` model interfaces share `specificationVersion`, `provider`,
+  // `modelId`, and `doGenerate`, so the kind is read from the one member each
+  // adds, in this order (premium for non-language models: owner decision
+  // 2026-11-15). Speech and transcription are structurally identical; the
+  // media wrapper tells them apart per call from the call options.
+  const model = target as Partial<Record<string, unknown>>;
+  if (typeof model.doStream === "function") {
+    return createPremiumLanguageModel(client, target as LanguageModelV3);
+  }
+  if (!isV3Model(model)) {
+    throw new EnlittConfigurationError(
+      "enlitt() accepts \"enlitt-standard\" or a Vercel AI SDK v3 language, image, speech, or transcription model."
+    );
+  }
+  if ("maxImagesPerCall" in model) {
+    return createPremiumMediaModel(client, target as ImageModelV3, "image");
+  }
+  return createPremiumMediaModel(client, target as SpeechModelV3 | TranscriptionModelV3, "audio");
+}
+
+/** The members every `v3` provider model has, checked before treating a target as a media model. */
+function isV3Model(model: Partial<Record<string, unknown>>): boolean {
+  return (
+    model.specificationVersion === "v3" &&
+    typeof model.provider === "string" &&
+    typeof model.modelId === "string" &&
+    typeof model.doGenerate === "function"
+  );
 }
 
 // --- Per-call provider options ---------------------------------------------

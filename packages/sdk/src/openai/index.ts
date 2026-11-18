@@ -11,3 +11,17 @@ export {
   type EnlittOpenAIStream,
   type OpenAIPremiumPriceContext
 } from "./client.js";
+
+export {
+  perImage,
+  perCharacter,
+  perAudioSecond,
+  type EnlittOpenAIAudio,
+  type EnlittOpenAIImages,
+  type EnlittOpenAIImageGenerateParams,
+  type EnlittOpenAIMediaCallOptions,
+  type EnlittOpenAIMediaPrice,
+  type EnlittOpenAISpeechCreateParams,
+  type EnlittOpenAITranscriptionCreateParams,
+  type OpenAIPremiumMediaPriceContext
+} from "./media.js";

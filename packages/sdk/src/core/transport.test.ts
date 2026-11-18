@@ -594,7 +594,10 @@ describe("package build: public surfaces", () => {
     "usage",
     "withPremiumCharge"
   ];
-  const VERCEL_SURFACE = ["ENLITT_STANDARD_MODEL", "enlitt", "perToken"];
+  const VERCEL_SURFACE = ["ENLITT_STANDARD_MODEL", "enlitt", "perToken", "perImage", "perCharacter", "perAudioSecond"];
+  // `./server` keeps its export names unchanged (spec: "compatibility
+  // aggregate"), so the media price helpers added to `./vercel` are not on it.
+  const VERCEL_COMPAT_SURFACE = ["ENLITT_STANDARD_MODEL", "enlitt", "perToken"];
 
   it("@enlitt/sdk/core exports exactly its documented surface and no internal transport", async () => {
     const entry: Record<string, unknown> = await import("./index.js");
@@ -614,7 +617,7 @@ describe("package build: public surfaces", () => {
     expect(surface(entry)).toEqual(
       [
         ...CORE_SURFACE,
-        ...VERCEL_SURFACE,
+        ...VERCEL_COMPAT_SURFACE,
         "createCallbackHandler",
         "createClientSignInHandler",
         "createLoginStartHandler",

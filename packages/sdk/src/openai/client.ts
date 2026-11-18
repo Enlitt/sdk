@@ -38,6 +38,13 @@ import {
   type InternalEnlittClient
 } from "../core/transport.js";
 
+import {
+  createMediaMethods,
+  type EnlittOpenAIAudio,
+  type EnlittOpenAIImages,
+  type OpenAIMediaProvider
+} from "./media.js";
+
 export { ENLITT_STANDARD_MODEL };
 
 export interface EnlittOpenAIRequestOptions {
@@ -75,6 +82,10 @@ export type EnlittOpenAIResponseCreateParamsStreaming = ResponseCreateParamsStre
 export type EnlittOpenAIStream = AsyncIterable<ResponseStreamEvent>;
 
 export interface EnlittOpenAIClient {
+  /** Premium-only image generation; see `media.ts`. */
+  readonly images: EnlittOpenAIImages;
+  /** Premium-only speech and transcription; see `media.ts`. */
+  readonly audio: EnlittOpenAIAudio;
   readonly responses: {
     create(
       body: EnlittOpenAIResponseCreateParamsNonStreaming,
@@ -116,6 +127,8 @@ export function enlitt(first: OpenAI | EnlittOptions = {}, second: EnlittOptions
 
   const client = createInternalClient(options);
   return {
+    // Premium-only image and audio methods (owner decision 2026-11-15).
+    ...createMediaMethods(client, provider as unknown as OpenAIMediaProvider | undefined),
     responses: {
       create: (body: EnlittOpenAIResponseCreateParamsNonStreaming | EnlittOpenAIResponseCreateParamsStreaming, requestOptions?: EnlittOpenAIRequestOptions) => {
         validateRequestOptions(requestOptions);
@@ -137,7 +150,7 @@ function isOpenAIClient(value: unknown): value is OpenAIResponsesClient {
   return typeof responses === "object" && responses !== null && typeof (responses as { create?: unknown }).create === "function";
 }
 
-function validateRequestOptions(options: EnlittOpenAIRequestOptions | undefined): void {
+export function validateRequestOptions(options: EnlittOpenAIRequestOptions | undefined): void {
   if (options === undefined) return;
   for (const key of Object.keys(options)) {
     if (key !== "signal" && key !== "timeout") {
@@ -149,7 +162,8 @@ function validateRequestOptions(options: EnlittOpenAIRequestOptions | undefined)
   }
 }
 
-function readCallOptions(body: { enlitt?: EnlittOpenAICallOptions }, mode: "standard" | "premium") {
+/** Validates `body.enlitt` under the shared call-option rules; also used by `media.ts`. */
+export function readCallOptions(body: { enlitt?: EnlittOpenAICallOptions }, mode: "standard" | "premium") {
   const input = body.enlitt ?? {};
   const known = new Set(["idempotencyKey", "maxCharge", "price", "reportingDeadlineMs", "metadata"]);
   for (const key of Object.keys(input)) {
@@ -586,7 +600,8 @@ function contextForEvents(events: ResponseStreamEvent[] | undefined, usage: Resp
   return { status, ...(events !== undefined ? { events } : {}), ...(usage !== undefined ? { usage } : {}), startedAt, endedAt, durationMs: endedAt.getTime() - startedAt.getTime(), ...(firstTokenAt !== undefined ? { timeToFirstTokenMs: firstTokenAt.getTime() - startedAt.getTime() } : {}), effectiveMaxChargeNanoUsd: operation.effectiveMaxChargeNanoUsd };
 }
 
-async function evaluatePrice(client: InternalEnlittClient, price: EnlittOpenAIPrice | undefined, context: OpenAIPremiumPriceContext): Promise<string> {
+/** The one price rule for this adapter, generic over the context so `media.ts` shares it. */
+export async function evaluatePrice<Context = OpenAIPremiumPriceContext>(client: InternalEnlittClient, price: string | ((context: Context) => string | Promise<string>) | undefined, context: Context): Promise<string> {
   if (price === undefined) return "0";
   if (typeof price === "string") return price;
   try { return assertNanoUsd(await price(context), "price() result"); }
