@@ -23,6 +23,7 @@
 
 import type {
   LanguageModelV3,
+  LanguageModelV4,
   LanguageModelV3CallOptions,
   LanguageModelV3StreamPart,
   LanguageModelV3Usage
@@ -96,10 +97,26 @@ export function perToken(rates: { input: string; output: string }): (context: Pr
  * once per step, so each step has its own maximum, price, and report; an
  * automatic retry of the same step re-presents the same prompt, resolves the
  * same call ID, and replays the same operation instead of beginning a second.
+ *
+ * A `v4` model (`ai@7`, Bug #28) is wrapped as a `v4` model. Its extra call
+ * options, result fields, part types, and finish reasons pass through by
+ * identity; the lifecycle below reads only members `v3` and `v4` share, which
+ * is why the body is written once against the `v3` types.
  */
-export function createPremiumLanguageModel(client: InternalEnlittClient, model: LanguageModelV3): LanguageModelV3 {
-  return {
-    specificationVersion: "v3",
+export function createPremiumLanguageModel(client: InternalEnlittClient, model: LanguageModelV3): LanguageModelV3;
+export function createPremiumLanguageModel(client: InternalEnlittClient, model: LanguageModelV4): LanguageModelV4;
+export function createPremiumLanguageModel(
+  client: InternalEnlittClient,
+  model: LanguageModelV3 | LanguageModelV4
+): LanguageModelV3 | LanguageModelV4;
+export function createPremiumLanguageModel(
+  client: InternalEnlittClient,
+  wrappedModel: LanguageModelV3 | LanguageModelV4
+): LanguageModelV3 | LanguageModelV4 {
+  // Read through the `v3` shape; see the doc comment for why that is safe.
+  const model = wrappedModel as LanguageModelV3;
+  const wrapper = {
+    specificationVersion: wrappedModel.specificationVersion,
     provider: model.provider,
     modelId: model.modelId,
     supportedUrls: model.supportedUrls,
@@ -116,6 +133,7 @@ export function createPremiumLanguageModel(client: InternalEnlittClient, model: 
       );
     }
   };
+  return wrapper as LanguageModelV3 | LanguageModelV4;
 
   /**
    * Reads this invocation's options and call identity, then hands the wrapper a

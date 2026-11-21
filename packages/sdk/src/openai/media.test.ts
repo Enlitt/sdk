@@ -2,11 +2,27 @@ import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from "vite
 import type OpenAI from "openai";
 import { EnlittConfigurationError } from "../core/errors.js";
 import { ENLITT_STANDARD_MODEL, enlitt } from "./client.js";
-import { perAudioSecond, perCharacter, perImage, type OpenAIPremiumMediaPriceContext } from "./media.js";
+import * as openaiEntry from "./index.js";
+import type { OpenAIPremiumMediaPriceContext } from "./media.js";
 
 // The OpenAI adapter's premium image, speech, and transcription methods
 // (specs/SDK-side routing.md "openai/media.ts"). Only `fetch` and the OpenAI
 // client are fakes; Enlitt's request building runs for real.
+
+// The SDK ships no media price helpers (owner decision 2026-11-20), so these
+// are written here the way a business would write its own price functions.
+// Each returns a NANOUSD string from the price context the SDK passes in.
+const pricePerImage = (rate: bigint) => (context: OpenAIPremiumMediaPriceContext): string =>
+  context.kind === "image" ? (rate * BigInt(context.response?.data?.length ?? 0)).toString() : "0";
+const pricePerCharacter = (rate: bigint) => (context: OpenAIPremiumMediaPriceContext): string =>
+  context.kind === "speech" && context.status === "completed" ? (rate * BigInt(context.characters)).toString() : "0";
+const pricePerSecond = (rate: bigint) => (context: OpenAIPremiumMediaPriceContext): string => {
+  if (context.kind !== "transcription" || typeof context.response !== "object") return "0";
+  const usage = (context.response as { usage?: { type?: string; seconds?: number } }).usage;
+  return usage?.type === "duration" && usage.seconds !== undefined
+    ? (rate * BigInt(Math.ceil(usage.seconds))).toString()
+    : "0";
+};
 
 const BASE_URL = "https://api.enlitt.test";
 
@@ -90,7 +106,7 @@ afterEach(() => {
 });
 
 describe("images.generate", () => {
-  it("admits before the provider, strips enlitt, labels the model, and settles with perImage", async () => {
+  it("admits before the provider, strips enlitt, labels the model, and settles with the price function", async () => {
     enlittServer();
     const { openai } = fakeOpenAI();
     const client = enlitt(openai as unknown as OpenAI, options());
@@ -98,7 +114,7 @@ describe("images.generate", () => {
       model: "gpt-image-1",
       prompt: "a secret cat",
       n: 2,
-      enlitt: { maxCharge: "500", price: perImage("40") }
+      enlitt: { maxCharge: "500", price: pricePerImage(40n) }
     });
     expect(result.data).toHaveLength(2);
     expect(openai.images.generate).toHaveBeenCalledWith({ model: "gpt-image-1", prompt: "a secret cat", n: 2 }, undefined);
@@ -177,7 +193,7 @@ describe("audio.speech.create", () => {
       model: "gpt-4o-mini-tts",
       input: "hé 🙂",
       voice: "alloy",
-      enlitt: { maxCharge: "100", price: perCharacter("5") }
+      enlitt: { maxCharge: "100", price: pricePerCharacter(5n) }
     });
     expect(result).toBe(speechResponse);
     expect(result.bodyUsed).toBe(false);
@@ -195,7 +211,7 @@ describe("audio.transcriptions.create", () => {
     const result = await client.audio.transcriptions.create({
       model: "gpt-4o-transcribe",
       file: new File([new Uint8Array([1])], "a.wav"),
-      enlitt: { maxCharge: "1000", price: perAudioSecond("100") }
+      enlitt: { maxCharge: "1000", price: pricePerSecond(100n) }
     });
     expect(result).toMatchObject({ text: "secret transcript" });
     expect(terminal()).toMatchObject({ status: "completed", charge_nano_usd: "500" });
@@ -212,24 +228,21 @@ describe("audio.transcriptions.create", () => {
   });
 });
 
-describe("OpenAI media price helpers", () => {
-  const base = { startedAt: new Date(0), endedAt: new Date(1), durationMs: 1, effectiveMaxChargeNanoUsd: "0" };
-
-  it("read verbose_json duration, charge zero for text responses, and stay exact beyond the safe range", () => {
-    const transcription = (response: unknown): OpenAIPremiumMediaPriceContext =>
-      ({ ...base, kind: "transcription", status: "completed", request: { model: "m", file: null }, response }) as never;
-    expect(perAudioSecond("10")(transcription({ text: "", duration: 1.2 }))).toBe("20");
-    expect(perAudioSecond("10")(transcription("plain text"))).toBe("0");
-    expect(perAudioSecond("10")(transcription({ text: "", usage: { type: "tokens", input_tokens: 1 } }))).toBe("0");
-    const image = { ...base, kind: "image", status: "completed", request: { prompt: "x" }, response: { created: 1, data: [{}, {}, {}] } } as never;
-    expect(perImage("9007199254740993")(image)).toBe("27021597764222979");
+describe("OpenAI media pricing", () => {
+  it("exports no media price helpers", () => {
+    for (const name of ["perImage", "perCharacter", "perAudioSecond"]) {
+      expect(Object.keys(openaiEntry), name).not.toContain(name);
+    }
   });
 
-  it("on the wrong kind charge zero and reach onTerminalReportError", async () => {
+  it("a price function that throws charges zero and reaches onTerminalReportError", async () => {
     enlittServer();
     const { openai } = fakeOpenAI();
     const client = enlitt(openai as unknown as OpenAI, options());
-    await client.audio.speech.create({ model: "tts-1", input: "abc", voice: "alloy", enlitt: { maxCharge: "100", price: perImage("5") } });
+    const throwingPrice = (): string => {
+      throw new Error("business pricing bug");
+    };
+    await client.audio.speech.create({ model: "tts-1", input: "abc", voice: "alloy", enlitt: { maxCharge: "100", price: throwingPrice } });
     expect(terminal()).toMatchObject({ status: "completed", charge_nano_usd: "0" });
     expect(reportErrors[0]).toBeInstanceOf(EnlittConfigurationError);
   });

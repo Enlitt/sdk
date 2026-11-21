@@ -308,3 +308,56 @@ describe("createPremiumLanguageModel() doStream", () => {
     expect(bodies()[1]).toMatchObject({ status: "failed", charge_nano_usd: "0" });
   });
 });
+
+// Bug #28: `ai@7` and the current provider packages produce `v4` models. The
+// wrapper keeps the wrapped model's version and passes v4-only members through.
+describe("createPremiumLanguageModel() with a v4 model", () => {
+  /** A v4 provider double: the v3 double relabelled, plus v4-only output. */
+  function providerV4(overrides: Record<string, unknown> = {}): LanguageModelV3 {
+    return provider({ specificationVersion: "v4", ...overrides } as never);
+  }
+
+  it("is wrapped as a v4 model with the provider identity unchanged", () => {
+    const wrapped = makeModel(providerV4());
+    expect(wrapped.specificationVersion).toBe("v4");
+    expect(wrapped.provider).toBe("openai");
+    expect(wrapped.modelId).toBe("gpt-5");
+  });
+
+  it("passes a v4 call option, result field, and interrupted finish reason through, charging as v3", async () => {
+    fetchMock.mockResolvedValueOnce(admitted()).mockResolvedValueOnce(settled());
+    const v4Result = {
+      ...generateResult(),
+      structuredOutputText: "{}",
+      finishReason: { unified: "interrupted", raw: "interrupted" }
+    };
+    const inner = providerV4({ doGenerate: vi.fn(async () => v4Result) });
+    const callOptions = { ...params({ maxCharge: "1000", price: "400" }), reasoning: "low" } as never;
+    const result = await makeModel(inner).doGenerate(callOptions);
+
+    // The provider received the call options object itself, v4 field included.
+    expect(inner.doGenerate).toHaveBeenCalledWith(callOptions);
+    expect((result as unknown as { structuredOutputText: string }).structuredOutputText).toBe("{}");
+    expect(result.finishReason).toEqual({ unified: "interrupted", raw: "interrupted" });
+    expect(bodies()[1]).toMatchObject({ status: "completed", charge_nano_usd: "400" });
+  });
+
+  it("streams v4-only parts (ping, custom) through unchanged and reports once", async () => {
+    fetchMock.mockResolvedValueOnce(admitted()).mockResolvedValueOnce(settled());
+    const v4Parts = [
+      { type: "ping" },
+      { type: "custom", kind: "vendor-event", data: { x: 1 } },
+      { type: "text-start", id: "t1" },
+      { type: "text-delta", id: "t1", delta: "hi" },
+      { type: "text-end", id: "t1" },
+      { type: "finish", finishReason: { unified: "stop", raw: "stop" }, usage: USAGE }
+    ] as unknown as LanguageModelV3StreamPart[];
+    const inner = providerV4({ doStream: vi.fn(async () => ({ stream: streamOf(v4Parts) })) });
+    const { stream } = await makeModel(inner).doStream(params({ maxCharge: "1000", price: "400" }));
+    const parts = await drain(stream);
+
+    expect(parts.slice(0, 5)).toEqual(v4Parts.slice(0, 5));
+    expect(parts.map((part) => part.type)).toEqual(v4Parts.map((part) => part.type));
+    expect(bodies().filter((body) => "status" in body)).toEqual([expect.objectContaining({ status: "completed", charge_nano_usd: "400" })]);
+  });
+});

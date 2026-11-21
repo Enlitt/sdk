@@ -25,7 +25,6 @@ import type {
 } from "openai/resources/audio/transcriptions";
 import { EnlittConfigurationError } from "../core/errors.js";
 import {
-  assertNanoUsd,
   isCancellation,
   runPremiumCharge,
   type PremiumChargeHandle,
@@ -339,61 +338,4 @@ function imageUsageFacts(result: unknown): Pick<PremiumTerminalFacts, "usage"> {
   const usage = (result as ImagesResponse | undefined)?.usage;
   if (usage === undefined) return {};
   return { usage: { inputTokens: usage.input_tokens, outputTokens: usage.output_tokens } };
-}
-
-// --- Price helpers ---------------------------------------------------------------
-
-/** Narrows a context to one kind, throwing `EnlittConfigurationError` (charged `"0"`, reported) otherwise. */
-function expectKind<K extends OpenAIPremiumMediaPriceContext["kind"]>(
-  context: OpenAIPremiumMediaPriceContext,
-  kind: K,
-  helper: string
-): Extract<OpenAIPremiumMediaPriceContext, { kind: K }> {
-  if (context.kind !== kind) {
-    throw new EnlittConfigurationError(`${helper}() prices ${kind} calls, but this call is ${context.kind}.`);
-  }
-  return context as Extract<OpenAIPremiumMediaPriceContext, { kind: K }>;
-}
-
-/** `rate` NANOUSD per returned image (`rate x response.data.length`); no response charges `"0"`. */
-export function perImage(rate: string): (context: OpenAIPremiumMediaPriceContext) => string {
-  const perUnit = BigInt(assertNanoUsd(rate, "perImage rate"));
-  return (context) => {
-    const image = expectKind(context, "image", "perImage");
-    return (perUnit * BigInt(image.response?.data?.length ?? 0)).toString();
-  };
-}
-
-/** `rate` NANOUSD per Unicode code point of `input` for a completed speech call. */
-export function perCharacter(rate: string): (context: OpenAIPremiumMediaPriceContext) => string {
-  const perUnit = BigInt(assertNanoUsd(rate, "perCharacter rate"));
-  return (context) => {
-    const speech = expectKind(context, "speech", "perCharacter");
-    return speech.status === "completed" ? (perUnit * BigInt(speech.characters)).toString() : "0";
-  };
-}
-
-/**
- * `rate` NANOUSD per started second of a completed transcription. The seconds
- * come from `usage` of type `"duration"`, else the `verbose_json` `duration`;
- * any other response charges `"0"`.
- */
-export function perAudioSecond(rate: string): (context: OpenAIPremiumMediaPriceContext) => string {
-  const perUnit = BigInt(assertNanoUsd(rate, "perAudioSecond rate"));
-  return (context) => {
-    const transcription = expectKind(context, "transcription", "perAudioSecond");
-    if (transcription.status !== "completed") return "0";
-    const seconds = audioSeconds(transcription.response);
-    return seconds === undefined ? "0" : (perUnit * BigInt(Math.ceil(seconds))).toString();
-  };
-}
-
-/** Reads the audio duration a transcription response reports, if any. */
-function audioSeconds(response: TranscriptionCreateResponse | string | undefined): number | undefined {
-  if (typeof response !== "object") return undefined;
-  const usage = (response as { usage?: { type?: unknown; seconds?: unknown } }).usage;
-  const fromUsage = usage?.type === "duration" ? usage.seconds : undefined;
-  const fromVerbose = (response as { duration?: unknown }).duration;
-  const seconds = typeof fromUsage === "number" ? fromUsage : typeof fromVerbose === "number" ? fromVerbose : undefined;
-  return seconds !== undefined && Number.isFinite(seconds) && seconds > 0 ? seconds : undefined;
 }

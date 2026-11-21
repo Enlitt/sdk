@@ -22,15 +22,17 @@
 import type {
   ImageModelV3,
   ImageModelV3CallOptions,
+  ImageModelV4,
   SpeechModelV3,
   SpeechModelV3CallOptions,
+  SpeechModelV4,
   TranscriptionModelV3,
-  TranscriptionModelV3CallOptions
+  TranscriptionModelV3CallOptions,
+  TranscriptionModelV4
 } from "@ai-sdk/provider";
 import { EnlittConfigurationError } from "../core/errors.js";
 import {
   assertCallId,
-  assertNanoUsd,
   generateRandomCallId,
   isCancellation,
   runPremiumCharge,
@@ -94,7 +96,13 @@ export type PremiumMediaPriceContext =
 export type EnlittMediaPrice = string | ((context: PremiumMediaPriceContext) => string | Promise<string>);
 
 /** Any of the three media model interfaces the wrapper accepts. */
-export type PremiumMediaModel = ImageModelV3 | SpeechModelV3 | TranscriptionModelV3;
+export type PremiumMediaModel =
+  | ImageModelV3
+  | ImageModelV4
+  | SpeechModelV3
+  | SpeechModelV4
+  | TranscriptionModelV3
+  | TranscriptionModelV4;
 
 // --- The wrapper ---------------------------------------------------------------
 
@@ -111,17 +119,26 @@ export type PremiumMediaModel = ImageModelV3 | SpeechModelV3 | TranscriptionMode
  *
  * Speech and transcription models have the same structural shape, so for
  * `kind: "audio"` each call decides which it is from its own options.
+ *
+ * A `v4` model (`ai@7`, Bug #28) is wrapped as a `v4` model. The call options
+ * and results this file reads exist in both versions, so the body is written
+ * once against the `v3` types. A v4 image model's `supportsFileInputs` and
+ * `supportsMaskInputs` are forwarded; a v4 transcription model's
+ * `doGenerateFromUrl` and `doStream`, and a streaming speech model's
+ * `doStream`, are deliberately not exposed, because they would call the
+ * provider without an Enlitt operation. `ai` then downloads a URL itself and
+ * calls `doGenerate`, and reports streaming as unsupported by the model.
  */
 export function createPremiumMediaModel(
   client: InternalEnlittClient,
-  model: ImageModelV3,
+  model: ImageModelV3 | ImageModelV4,
   kind: "image"
-): ImageModelV3;
+): ImageModelV3 | ImageModelV4;
 export function createPremiumMediaModel(
   client: InternalEnlittClient,
-  model: SpeechModelV3 | TranscriptionModelV3,
+  model: SpeechModelV3 | SpeechModelV4 | TranscriptionModelV3 | TranscriptionModelV4,
   kind: "audio"
-): SpeechModelV3 | TranscriptionModelV3;
+): SpeechModelV3 | SpeechModelV4 | TranscriptionModelV3 | TranscriptionModelV4;
 export function createPremiumMediaModel(
   client: InternalEnlittClient,
   model: PremiumMediaModel,
@@ -132,8 +149,8 @@ export function createPremiumMediaModel(
   if (kind === "image") {
     const image = model as ImageModelV3;
     const maxImagesPerCall = image.maxImagesPerCall;
-    const wrapped: ImageModelV3 = {
-      specificationVersion: "v3",
+    const wrapped = {
+      specificationVersion: model.specificationVersion,
       provider: image.provider,
       modelId: image.modelId,
       // Forwarded by reference. A function is bound so that a provider
@@ -155,16 +172,20 @@ export function createPremiumMediaModel(
           // result is therefore returned by identity.
           mapResult: (result) => result,
           facts: (result) => imageUsageFacts(result)
-        })
+        }),
+      // v4 only: whether the model accepts input files and masks. Forwarded
+      // by reference when present, like `maxImagesPerCall`.
+      ...forwardOptional(model, "supportsFileInputs"),
+      ...forwardOptional(model, "supportsMaskInputs")
     };
-    return wrapped;
+    return wrapped as ImageModelV3 | ImageModelV4;
   }
 
   // Speech and transcription share every member but `doGenerate`'s options,
   // so the wrapper accepts either and decides per call.
   const audio = model as SpeechModelV3 & TranscriptionModelV3;
   const wrapped = {
-    specificationVersion: "v3" as const,
+    specificationVersion: model.specificationVersion,
     provider: audio.provider,
     modelId: audio.modelId,
     doGenerate(options: SpeechModelV3CallOptions | TranscriptionModelV3CallOptions) {
@@ -197,7 +218,12 @@ export function createPremiumMediaModel(
       );
     }
   };
-  return wrapped as SpeechModelV3 | TranscriptionModelV3;
+  return wrapped as SpeechModelV3 | SpeechModelV4 | TranscriptionModelV3 | TranscriptionModelV4;
+}
+
+/** `{ [key]: model[key] }` when the model has that member, else `{}`. */
+function forwardOptional(model: PremiumMediaModel, key: "supportsFileInputs" | "supportsMaskInputs") {
+  return key in model ? { [key]: (model as Partial<Record<typeof key, unknown>>)[key] } : {};
 }
 
 /** Speech call options carry the text to speak. */
@@ -369,64 +395,5 @@ function attachEnlittMetadata<Result>(result: Result, operation: PremiumChargeHa
         effectiveMaxChargeNanoUsd: operation.effectiveMaxChargeNanoUsd
       }
     }
-  };
-}
-
-// --- Price helpers ---------------------------------------------------------------
-
-/**
- * Narrows a context to one kind, throwing `EnlittConfigurationError` otherwise.
- * The price rules turn that throw into a `"0"` charge reported to
- * `onTerminalReportError`, so a helper attached to the wrong model is visible.
- */
-function expectKind<K extends PremiumMediaPriceContext["kind"]>(
-  context: PremiumMediaPriceContext,
-  kind: K,
-  helper: string
-): Extract<PremiumMediaPriceContext, { kind: K }> {
-  if (context.kind !== kind) {
-    throw new EnlittConfigurationError(`${helper}() prices ${kind} calls, but this call is ${context.kind}.`);
-  }
-  return context as Extract<PremiumMediaPriceContext, { kind: K }>;
-}
-
-/**
- * Price function charging `rate` NANOUSD per generated image
- * (`rate x result.images.length`, exact `bigint`). A call with no result
- * (canceled) charges `"0"`.
- */
-export function perImage(rate: string): (context: PremiumMediaPriceContext) => string {
-  const perUnit = BigInt(assertNanoUsd(rate, "perImage rate"));
-  return (context) => {
-    const image = expectKind(context, "image", "perImage");
-    return (perUnit * BigInt(image.result?.images.length ?? 0)).toString();
-  };
-}
-
-/**
- * Price function charging `rate` NANOUSD per Unicode code point of the text a
- * speech call spoke. A canceled call charges `"0"`.
- */
-export function perCharacter(rate: string): (context: PremiumMediaPriceContext) => string {
-  const perUnit = BigInt(assertNanoUsd(rate, "perCharacter rate"));
-  return (context) => {
-    const speech = expectKind(context, "speech", "perCharacter");
-    if (speech.status !== "completed") return "0";
-    return (perUnit * BigInt(speech.request.characters)).toString();
-  };
-}
-
-/**
- * Price function charging `rate` NANOUSD per started second of transcribed
- * audio (`rate x ceil(result.durationInSeconds)`). An absent duration or a
- * canceled call charges `"0"`.
- */
-export function perAudioSecond(rate: string): (context: PremiumMediaPriceContext) => string {
-  const perUnit = BigInt(assertNanoUsd(rate, "perAudioSecond rate"));
-  return (context) => {
-    const transcription = expectKind(context, "transcription", "perAudioSecond");
-    const seconds = transcription.status === "completed" ? transcription.result?.durationInSeconds : undefined;
-    if (seconds === undefined || !Number.isFinite(seconds) || seconds <= 0) return "0";
-    return (perUnit * BigInt(Math.ceil(seconds))).toString();
   };
 }

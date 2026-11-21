@@ -54,8 +54,8 @@ All four entries are server-only. The root and browser entries currently
 export no integration APIs. Never put a business key in browser code.
 
 Premium pricing uses exact NANOUSD strings with `maxCharge` and `price`.
-Premium also wraps image, speech, and transcription models (`perImage`,
-`perCharacter`, and `perAudioSecond` price them); there is no standard media model.
+Premium also wraps image, speech, and transcription models, priced with a constant
+or your own price function; there is no standard media model.
 Test applications consume real credits.
 
 Read the [developer guide](https://enlitt.com/docs), starting with

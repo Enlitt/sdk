@@ -13,9 +13,6 @@ export {
 } from "./client.js";
 
 export {
-  perImage,
-  perCharacter,
-  perAudioSecond,
   type EnlittOpenAIAudio,
   type EnlittOpenAIImages,
   type EnlittOpenAIImageGenerateParams,

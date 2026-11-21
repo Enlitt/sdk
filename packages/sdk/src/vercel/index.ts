@@ -2,10 +2,9 @@
  * `@enlitt/sdk/vercel` — the Vercel AI SDK adapter entry.
  *
  * Exactly the surface a business using the Vercel AI SDK needs: the `enlitt()`
- * model factory, the one standard model string, the price helpers (`perToken()`
- * for language models; `perImage()`, `perCharacter()`, `perAudioSecond()` for
- * image, speech, and transcription models),
- * and the types a business writes down when it wraps `enlitt()` or builds a
+ * model factory, the one standard model string, the `perToken()` price helper
+ * for language models (image, speech, and transcription calls have no helper:
+ * the business passes a constant or its own price function), and the types a business writes down when it wraps `enlitt()` or builds a
  * premium price. Shared construction options (`EnlittOptions`), errors, and
  * session helpers are not redeclared here; they live in `@enlitt/sdk/core`.
  *
@@ -26,9 +25,6 @@ export {
 export { perToken } from "./premium-language-model.js";
 
 export {
-  perImage,
-  perCharacter,
-  perAudioSecond,
   type EnlittMediaPrice,
   type PremiumMediaPriceContext
 } from "./premium-media-model.js";

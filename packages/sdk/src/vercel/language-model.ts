@@ -1,6 +1,8 @@
 import type {
   ImageModelV3,
+  ImageModelV4,
   LanguageModelV3,
+  LanguageModelV4,
   LanguageModelV3CallOptions,
   LanguageModelV3Content,
   LanguageModelV3FinishReason,
@@ -9,7 +11,9 @@ import type {
   SharedV3ProviderMetadata,
   SharedV3ProviderOptions,
   SpeechModelV3,
-  TranscriptionModelV3
+  SpeechModelV4,
+  TranscriptionModelV3,
+  TranscriptionModelV4
 } from "@ai-sdk/provider";
 import { ENLITT_STANDARD_MODEL } from "@enlitt/protocol";
 import { EnlittConfigurationError } from "../core/errors.js";
@@ -40,8 +44,24 @@ export { ENLITT_STANDARD_MODEL };
  * string, or a provider model the business selected and pays for. The mode
  * is the argument's type, not a separate field, so there is no "unknown
  * mode" case and no "premium model missing" case; both are unrepresentable.
+ *
+ * It names the `v3` language model only, as it did before `v4` support (Bug
+ * #28): widening it would turn a business's `Exclude<EnlittTarget, string>`
+ * into a union that `ai@6`'s `generateText` rejects. A `v4` model has its own
+ * `enlitt()` overload instead, and `enlitt()` itself accepts either.
  */
 export type EnlittTarget = typeof ENLITT_STANDARD_MODEL | LanguageModelV3;
+
+/** Every provider model `enlitt()` wraps in premium mode, of either supported specification. */
+type ProviderModel =
+  | LanguageModelV3
+  | LanguageModelV4
+  | ImageModelV3
+  | ImageModelV4
+  | SpeechModelV3
+  | SpeechModelV4
+  | TranscriptionModelV3
+  | TranscriptionModelV4;
 
 /**
  * The only public model factory in this package.
@@ -50,7 +70,8 @@ export type EnlittTarget = typeof ENLITT_STANDARD_MODEL | LanguageModelV3;
  * `enlitt(myProviderModel)` returns transparent middleware around it in
  * premium mode. A provider model may be a language, image, speech, or
  * transcription model, and the result has the same interface as the model
- * passed in; standard is a language model only. Both modes require the business's application secret, resolved
+ * passed in, including its specification version: `v3` for `ai@6`, `v4` for
+ * `ai@7` (Bug #28). Standard is a language model only. Both modes require the business's application secret, resolved
  * once here by `createInternalClient()`, which also asserts a server runtime
  * (before any secret is touched) and resolves and validates the base URL once.
  * A missing or invalid secret is an `EnlittConfigurationError` thrown before the
@@ -64,43 +85,58 @@ export type EnlittTarget = typeof ENLITT_STANDARD_MODEL | LanguageModelV3;
  * `withPremiumCharge()` and `usage()`.
  */
 export function enlitt(target: EnlittTarget, options?: EnlittOptions): LanguageModelV3;
+export function enlitt(target: LanguageModelV4, options?: EnlittOptions): LanguageModelV4;
 export function enlitt(target: ImageModelV3, options?: EnlittOptions): ImageModelV3;
+export function enlitt(target: ImageModelV4, options?: EnlittOptions): ImageModelV4;
 export function enlitt(target: SpeechModelV3, options?: EnlittOptions): SpeechModelV3;
+export function enlitt(target: SpeechModelV4, options?: EnlittOptions): SpeechModelV4;
 export function enlitt(target: TranscriptionModelV3, options?: EnlittOptions): TranscriptionModelV3;
+export function enlitt(target: TranscriptionModelV4, options?: EnlittOptions): TranscriptionModelV4;
 export function enlitt(
-  target: EnlittTarget | ImageModelV3 | SpeechModelV3 | TranscriptionModelV3,
+  target: EnlittTarget | ProviderModel,
   options: EnlittOptions = {}
-): LanguageModelV3 | ImageModelV3 | SpeechModelV3 | TranscriptionModelV3 {
+): ProviderModel {
   const client = createInternalClient(options);
 
   if (target === ENLITT_STANDARD_MODEL) {
     return createStandardLanguageModel(client);
   }
 
-  // The four `v3` model interfaces share `specificationVersion`, `provider`,
-  // `modelId`, and `doGenerate`, so the kind is read from the one member each
-  // adds, in this order (premium for non-language models: owner decision
-  // 2026-11-15). Speech and transcription are structurally identical; the
-  // media wrapper tells them apart per call from the call options.
+  // Only the v3 (`ai@6`) and v4 (`ai@7`) provider specifications are wrapped.
+  // Anything else is refused here, before any request, so a model from a
+  // specification the wrappers do not account for can never reach a provider.
   const model = target as Partial<Record<string, unknown>>;
-  if (typeof model.doStream === "function") {
-    return createPremiumLanguageModel(client, target as LanguageModelV3);
-  }
-  if (!isV3Model(model)) {
+  if (!isSupportedModel(model)) {
     throw new EnlittConfigurationError(
-      "enlitt() accepts \"enlitt-standard\" or a Vercel AI SDK v3 language, image, speech, or transcription model."
+      "enlitt() accepts \"enlitt-standard\" or a Vercel AI SDK v3 or v4 language, image, speech, or transcription model."
     );
   }
-  if ("maxImagesPerCall" in model) {
-    return createPremiumMediaModel(client, target as ImageModelV3, "image");
+
+  // The model interfaces of each version share `specificationVersion`,
+  // `provider`, `modelId`, and `doGenerate`, so the kind is read from the
+  // members each adds, in this order (premium for non-language models: owner
+  // decision 2026-11-15). A language model is `doStream` *with*
+  // `supportedUrls`: `doStream` alone is not enough, because a v4
+  // transcription model and a v4 streaming speech model also have one.
+  // Speech and transcription are otherwise structurally identical; the media
+  // wrapper tells them apart per call from the call options.
+  if (typeof model.doStream === "function" && "supportedUrls" in model) {
+    return createPremiumLanguageModel(client, target as LanguageModelV3 | LanguageModelV4);
   }
-  return createPremiumMediaModel(client, target as SpeechModelV3 | TranscriptionModelV3, "audio");
+  if ("maxImagesPerCall" in model) {
+    return createPremiumMediaModel(client, target as ImageModelV3 | ImageModelV4, "image");
+  }
+  return createPremiumMediaModel(
+    client,
+    target as SpeechModelV3 | SpeechModelV4 | TranscriptionModelV3 | TranscriptionModelV4,
+    "audio"
+  );
 }
 
-/** The members every `v3` provider model has, checked before treating a target as a media model. */
-function isV3Model(model: Partial<Record<string, unknown>>): boolean {
+/** The members every supported (`v3` or `v4`) provider model has. */
+function isSupportedModel(model: Partial<Record<string, unknown>>): boolean {
   return (
-    model.specificationVersion === "v3" &&
+    (model.specificationVersion === "v3" || model.specificationVersion === "v4") &&
     typeof model.provider === "string" &&
     typeof model.modelId === "string" &&
     typeof model.doGenerate === "function"

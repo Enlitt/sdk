@@ -4,11 +4,23 @@ import { experimental_generateSpeech, experimental_transcribe, generateImage } f
 import { EnlittConfigurationError } from "../core/errors.js";
 import { createInternalClient } from "../core/transport.js";
 import { enlitt } from "./language-model.js";
-import { createPremiumMediaModel, perAudioSecond, perCharacter, perImage, type PremiumMediaPriceContext } from "./premium-media-model.js";
+import * as vercelEntry from "./index.js";
+import { createPremiumMediaModel, type PremiumMediaPriceContext } from "./premium-media-model.js";
 
 // Premium image, speech, and transcription through the Vercel adapter
 // (specs/SDK-side routing.md "vercel/premium-media-model.ts"). Only `fetch` and
 // the wrapped provider models are fakes; Enlitt's request building runs for real.
+
+// The SDK ships no media price helpers (owner decision 2026-11-20), so these
+// are written here the way a business would write its own price functions.
+const pricePerImage = (rate: bigint) => (context: PremiumMediaPriceContext): string =>
+  context.kind === "image" ? (rate * BigInt(context.result?.images.length ?? 0)).toString() : "0";
+const pricePerCharacter = (rate: bigint) => (context: PremiumMediaPriceContext): string =>
+  context.kind === "speech" && context.status === "completed" ? (rate * BigInt(context.request.characters)).toString() : "0";
+const pricePerSecond = (rate: bigint) => (context: PremiumMediaPriceContext): string => {
+  const seconds = context.kind === "transcription" ? context.result?.durationInSeconds : undefined;
+  return seconds !== undefined && seconds > 0 ? (rate * BigInt(Math.ceil(seconds))).toString() : "0";
+};
 
 const BASE_URL = "https://api.enlitt.test";
 const SECRET = "sk_test_1234567890";
@@ -200,7 +212,7 @@ describe("premium image calls", () => {
       seed: undefined,
       files: undefined,
       mask: undefined,
-      providerOptions: { enlitt: { maxCharge: "900", price: perImage("100") as never } }
+      providerOptions: { enlitt: { maxCharge: "900", price: pricePerImage(100n) as never } }
     });
 
     expect(order).toEqual(["begin", "provider", "report"]);
@@ -232,7 +244,7 @@ describe("premium image calls", () => {
     const model = enlitt(imageModel(), clientOptions());
     await model.doGenerate({
       prompt: "x", n: 2, size: undefined, aspectRatio: undefined, seed: undefined, files: undefined, mask: undefined,
-      providerOptions: { enlitt: { maxCharge: "900", price: perImage("100") as never } }
+      providerOptions: { enlitt: { maxCharge: "900", price: pricePerImage(100n) as never } }
     });
     expect(terminalBodies()[0]).toMatchObject({ status: "completed", charge_nano_usd: "150" });
   });
@@ -304,7 +316,7 @@ describe("premium image calls", () => {
       model: enlitt(inner, clientOptions()),
       prompt: "three secret cats",
       n: 3,
-      providerOptions: { enlitt: { maxCharge: "1000", price: perImage("10") as never } }
+      providerOptions: { enlitt: { maxCharge: "1000", price: pricePerImage(10n) as never } }
     });
     expect(result.images).toHaveLength(3);
     expect(inner.doGenerate).toHaveBeenCalledTimes(2);
@@ -324,7 +336,7 @@ describe("premium speech and transcription calls", () => {
     const result = await model.doGenerate({
       text: "héllo 🙂",
       voice: "alloy",
-      providerOptions: { enlitt: { maxCharge: "1000", price: perCharacter("3") as never } }
+      providerOptions: { enlitt: { maxCharge: "1000", price: pricePerCharacter(3n) as never } }
     });
     // "héllo 🙂" is 7 code points (the emoji counts once).
     expect(terminalBodies()[0]).toMatchObject({ status: "completed", charge_nano_usd: "21" });
@@ -341,7 +353,7 @@ describe("premium speech and transcription calls", () => {
     const result = await model.doGenerate({
       audio: new Uint8Array([9, 9, 9]),
       mediaType: "audio/wav",
-      providerOptions: { enlitt: { maxCharge: "1000", price: perAudioSecond("50") as never } }
+      providerOptions: { enlitt: { maxCharge: "1000", price: pricePerSecond(50n) as never } }
     });
     expect(result.text).toBe("secret transcript");
     expect(terminalBodies()[0]).toMatchObject({ status: "completed", charge_nano_usd: "150" });
@@ -370,7 +382,7 @@ describe("premium speech and transcription calls", () => {
     const speech = await experimental_generateSpeech({
       model: enlitt(speechModel(), clientOptions()),
       text: "abc",
-      providerOptions: { enlitt: { maxCharge: "100", price: perCharacter("1") as never } }
+      providerOptions: { enlitt: { maxCharge: "100", price: pricePerCharacter(1n) as never } }
     });
     expect(speech.audio.uint8Array).toEqual(new Uint8Array([1, 2, 3]));
     const transcript = await experimental_transcribe({
@@ -383,50 +395,106 @@ describe("premium speech and transcription calls", () => {
   });
 });
 
-describe("media price helpers", () => {
-  const base = {
-    startedAt: new Date(0),
-    endedAt: new Date(1),
-    durationMs: 1,
-    effectiveMaxChargeNanoUsd: "0"
-  };
-
-  it("compute exact bigint products beyond the safe-integer range", () => {
-    const huge = "9007199254740993";
-    const image: PremiumMediaPriceContext = {
-      ...base, kind: "image", status: "completed", request: { n: 2 },
-      result: { images: ["a", "b"], warnings: [], response: { timestamp: new Date(), modelId: "m", headers: undefined } }
-    };
-    expect(perImage(huge)(image)).toBe("18014398509481986");
+describe("media pricing", () => {
+  it("exports no media price helpers", () => {
+    for (const name of ["perImage", "perCharacter", "perAudioSecond"]) {
+      expect(Object.keys(vercelEntry), name).not.toContain(name);
+    }
   });
 
-  it("charge zero on cancellation or a missing duration, and round seconds up", () => {
-    const speech: PremiumMediaPriceContext = { ...base, kind: "speech", status: "canceled", request: { characters: 5 } };
-    expect(perCharacter("2")(speech)).toBe("0");
-    const transcription = (durationInSeconds: number | undefined): PremiumMediaPriceContext => ({
-      ...base, kind: "transcription", status: "completed", request: { mediaType: "audio/wav" },
-      result: { text: "", segments: [], language: undefined, durationInSeconds, warnings: [], response: { timestamp: new Date(), modelId: "m" } }
-    });
-    expect(perAudioSecond("10")(transcription(undefined))).toBe("0");
-    expect(perAudioSecond("10")(transcription(0.1))).toBe("10");
-    expect(perAudioSecond("10")(transcription(3))).toBe("30");
-    const noResult: PremiumMediaPriceContext = { ...base, kind: "image", status: "canceled", request: { n: 1 } };
-    expect(perImage("10")(noResult)).toBe("0");
-  });
-
-  it("reject an invalid rate at creation and a context of another kind when run", () => {
-    expect(() => perImage("1.5")).toThrow(EnlittConfigurationError);
-    expect(() => perCharacter("-1")).toThrow(EnlittConfigurationError);
-    const speech: PremiumMediaPriceContext = { ...base, kind: "speech", status: "completed", request: { characters: 5 } };
-    expect(() => perImage("1")(speech)).toThrow(EnlittConfigurationError);
-  });
-
-  it("a helper on the wrong kind charges zero and reaches onTerminalReportError", async () => {
+  it("passes the speech context to the business's price function and reports its amount", async () => {
     enlittServer();
     const client = createInternalClient(clientOptions());
     const model = createPremiumMediaModel(client, speechModel(), "audio");
-    await model.doGenerate({ text: "abc", providerOptions: { enlitt: { maxCharge: "100", price: perImage("5") as never } } } as never);
+    const seen: PremiumMediaPriceContext[] = [];
+    const price = (context: PremiumMediaPriceContext): string => {
+      seen.push(context);
+      return "42";
+    };
+    await model.doGenerate({ text: "abc", providerOptions: { enlitt: { maxCharge: "100", price: price as never } } } as never);
+    expect(seen).toHaveLength(1);
+    expect(seen[0]).toMatchObject({ kind: "speech", status: "completed", request: { characters: 3 } });
+    expect(terminalBodies()[0]).toMatchObject({ status: "completed", charge_nano_usd: "42" });
+  });
+
+  it("a price function that throws charges zero and reaches onTerminalReportError", async () => {
+    enlittServer();
+    const client = createInternalClient(clientOptions());
+    const model = createPremiumMediaModel(client, speechModel(), "audio");
+    const throwingPrice = (): string => {
+      throw new Error("business pricing bug");
+    };
+    await model.doGenerate({ text: "abc", providerOptions: { enlitt: { maxCharge: "100", price: throwingPrice as never } } } as never);
     expect(terminalBodies()[0]).toMatchObject({ status: "completed", charge_nano_usd: "0" });
     expect(reportErrors[0]).toBeInstanceOf(EnlittConfigurationError);
+  });
+});
+
+// Bug #28: `ai@7` and the current provider packages produce `v4` models.
+describe("enlitt() with v4 models", () => {
+  it("wraps v4 language, image, speech, and transcription models as v4", () => {
+    const language = enlitt(
+      {
+        specificationVersion: "v4",
+        provider: "openai.responses",
+        modelId: "gpt-5-mini",
+        supportedUrls: {},
+        doGenerate: vi.fn(),
+        doStream: vi.fn()
+      } as never,
+      clientOptions()
+    ) as unknown as { specificationVersion: string; doStream: unknown };
+    expect(language.specificationVersion).toBe("v4");
+    expect(typeof language.doStream).toBe("function");
+
+    for (const inner of [imageModel(), speechModel(), transcriptionModel()]) {
+      const wrapped = enlitt({ ...inner, specificationVersion: "v4" } as never, clientOptions()) as unknown as {
+        specificationVersion: string;
+        modelId: string;
+      };
+      expect(wrapped.specificationVersion, inner.modelId).toBe("v4");
+      expect(wrapped.modelId).toBe(inner.modelId);
+    }
+  });
+
+  it("forwards a v4 image model's supportsFileInputs and supportsMaskInputs", () => {
+    const wrapped = enlitt(
+      { ...imageModel(), specificationVersion: "v4", supportsFileInputs: true, supportsMaskInputs: false } as never,
+      clientOptions()
+    ) as unknown as Record<string, unknown>;
+    expect(wrapped.supportsFileInputs).toBe(true);
+    expect(wrapped.supportsMaskInputs).toBe(false);
+    // A v3 image model has neither member, and the wrapper adds none.
+    expect("supportsFileInputs" in (enlitt(imageModel(), clientOptions()) as object)).toBe(false);
+  });
+
+  it("treats a v4 transcription model with doStream as media and exposes neither doStream nor doGenerateFromUrl", async () => {
+    enlittServer();
+    const inner = {
+      ...transcriptionModel(),
+      specificationVersion: "v4",
+      doStream: vi.fn(),
+      doGenerateFromUrl: vi.fn()
+    };
+    const wrapped = enlitt(inner as never, clientOptions()) as unknown as Record<string, unknown> & TranscriptionModelV3;
+    expect("doStream" in wrapped).toBe(false);
+    expect("doGenerateFromUrl" in wrapped).toBe(false);
+
+    // It is still a working premium transcription model.
+    await wrapped.doGenerate({
+      audio: new Uint8Array([1, 2, 3]),
+      mediaType: "audio/wav",
+      providerOptions: { enlitt: { maxCharge: "100", price: "7" } }
+    } as never);
+    expect(inner.doGenerate).toHaveBeenCalledTimes(1);
+    expect(inner.doStream).not.toHaveBeenCalled();
+    expect(terminalBodies()[0]).toMatchObject({ status: "completed", charge_nano_usd: "7" });
+  });
+
+  it("refuses a model of a later specification (v5) at construction", () => {
+    expect(() => enlitt({ ...speechModel(), specificationVersion: "v5" } as never, clientOptions())).toThrow(
+      EnlittConfigurationError
+    );
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 });

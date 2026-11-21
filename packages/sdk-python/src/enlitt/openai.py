@@ -171,13 +171,21 @@ class _ResolvedCall:
 
 
 def read_call_options(
-    options: EnlittCallOptions | None, mode: Literal["standard", "premium"]
+    options: Any,
+    mode: Literal["standard", "premium"],
+    *,
+    options_type: type[Any] = EnlittCallOptions,
 ) -> _ResolvedCall:
-    """Validate ``enlitt=`` for one mode. Every failure is an ``EnlittConfigurationError``."""
+    """Validate ``enlitt=`` for one mode. Every failure is an ``EnlittConfigurationError``.
+
+    ``options_type`` is the dataclass the caller must pass: ``EnlittCallOptions`` for
+    ``responses.create``, ``EnlittMediaCallOptions`` for the media methods. Both have the same
+    five fields, so the rules below are shared; only the price function's argument differs.
+    """
     if options is None:
-        options = EnlittCallOptions()
-    if not isinstance(options, EnlittCallOptions):
-        raise EnlittConfigurationError("enlitt must be an EnlittCallOptions.")
+        options = options_type()
+    if not isinstance(options, options_type):
+        raise EnlittConfigurationError(f"enlitt must be an {options_type.__name__}.")
     call_id = (
         _transport.validate_idempotency_key(options.idempotency_key)
         if options.idempotency_key is not None
@@ -995,6 +1003,19 @@ class EnlittOpenAI:
         self._provider = client
         self._client = enlitt_client
         self.responses = _Responses(self)
+        # The premium-only media methods (``openai/media.ts``), in their own module.
+        self.images = _openai_media.Images(self)
+        self.audio = _openai_media.Audio(self)
+
+    @property
+    def provider(self) -> AsyncOpenAI | None:
+        """The business's own ``AsyncOpenAI`` client, or ``None`` for a standard-only client."""
+        return self._provider
+
+    @property
+    def internal_client(self) -> InternalEnlittClient:
+        """The shared Enlitt transport client (internal; used by the media methods)."""
+        return self._client
 
     def __repr__(self) -> str:
         return "EnlittOpenAI()"
@@ -1123,3 +1144,27 @@ def enlitt(client: AsyncOpenAI | None = None, options: EnlittOptions | None = No
         raise EnlittConfigurationError("client must be an AsyncOpenAI client.")
     internal = _transport.create_internal_client(options)
     return EnlittOpenAI(cast("AsyncOpenAI | None", candidate), internal)
+
+
+# The media module imports names defined above, so it is imported last. Its public names are
+# part of ``enlitt.openai``.
+from . import _openai_media  # noqa: E402
+from ._openai_media import (  # noqa: E402
+    EnlittMediaCallOptions,
+    EnlittOpenAIMediaPrice,
+    OpenAIPremiumMediaPriceContext,
+)
+
+__all__ = [
+    "ENLITT_STANDARD_MODEL",
+    "EnlittCallOptions",
+    "EnlittMediaCallOptions",
+    "EnlittOpenAI",
+    "EnlittOpenAIMediaPrice",
+    "EnlittOpenAIPrice",
+    "EnlittOpenAIStream",
+    "OpenAIPremiumMediaPriceContext",
+    "OpenAIPremiumPriceContext",
+    "enlitt",
+    "per_token",
+]
