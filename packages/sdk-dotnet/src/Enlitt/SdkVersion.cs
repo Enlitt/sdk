@@ -4,5 +4,5 @@ namespace Enlitt;
 public static class SdkVersion
 {
   /// <summary>The package semantic version, sent as <c>X-Enlitt-SDK-Version: enlitt-dotnet/&lt;Value&gt;</c>.</summary>
-  public const string Value = "0.1.0";
+  public const string Value = "0.1.1";
 }

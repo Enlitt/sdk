@@ -67,6 +67,49 @@ await EnlittSdk.WithPremiumChargeAsync(
 Amounts are canonical NANOUSD strings and are kept exact beyond 2^63. A refused call never invokes your provider.
 Every call sends exactly one terminal report; a report that cannot be delivered goes to `EnlittOptions.OnTerminalReportError`.
 
+## Images, speech, and transcription
+
+Wrap your own `IImageGenerator`, `ITextToSpeechClient`, or `ISpeechToTextClient` the same way. Media is premium only (there is no standard media client), and each call is one premium operation. Set `EnlittMediaProviderOptions` under `AdditionalProperties["enlitt"]` of the call's options.
+
+```csharp
+IImageGenerator images = EnlittImageGenerator.Premium(myImageGenerator);
+await images.GenerateAsync(
+    new ImageGenerationRequest("A lighthouse at dusk"),
+    new ImageGenerationOptions
+    {
+        Count = 1,
+        AdditionalProperties = new() { ["enlitt"] = new EnlittMediaProviderOptions { MaxCharge = "80000000", Price = "40000000" } },
+    });
+
+ITextToSpeechClient speech = EnlittTextToSpeechClient.Premium(mySpeechClient);
+await speech.GetAudioAsync(
+    "Hello there",
+    new TextToSpeechOptions
+    {
+        AdditionalProperties = new()
+        {
+            ["enlitt"] = new EnlittMediaProviderOptions
+            {
+                MaxCharge = "5000000",
+                // A price function sees the code-point count of the text; the SDK ships no media price helpers.
+                Price = (Func<PremiumMediaPriceContext, ValueTask<string>>)(c => ValueTask.FromResult((c.Characters!.Value * 1000L).ToString())),
+            },
+        },
+    });
+
+ISpeechToTextClient transcriber = EnlittSpeechToTextClient.Premium(myTranscriber);
+await transcriber.GetTextAsync(
+    audioStream,
+    new SpeechToTextOptions
+    {
+        AdditionalProperties = new() { ["enlitt"] = new EnlittMediaProviderOptions { MaxCharge = "5000000", Price = "2000000" } },
+    });
+```
+
+Your inner client must report its metadata (`ImageGeneratorMetadata`, `TextToSpeechClientMetadata`, or `SpeechToTextClientMetadata`) so the call can be labelled. Streaming (`GetStreamingAudioAsync`, `GetStreamingTextAsync`) is not supported through Enlitt and throws `EnlittConfigurationException`. A supplied `IdempotencyKey` is the call identity itself, so reuse one only for a retry of the same call.
+
+These interfaces are experimental in `Microsoft.Extensions.AI` (diagnostic `MEAI001`). Using them in your own project raises that diagnostic, so suppress it there: `<NoWarn>$(NoWarn);MEAI001</NoWarn>` in your csproj.
+
 ## Errors
 
 All failures derive from `EnlittException` (`Code`, `ProviderInvoked`, `Retryable`, `RetryAfterMs`, `RequestId`, `AuthorizeUrl`).

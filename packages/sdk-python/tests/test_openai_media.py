@@ -209,7 +209,7 @@ async def test_image_usage_is_the_only_reported_fact_besides_timing(api: respx.M
     body = the_report(report)
     assert body["usage"] == {"input_tokens": 11, "output_tokens": 22}
     assert set(body["timing"]) == {"started_at", "ended_at"}
-    for absent in ("finish_reason", "provider_response_id", "delivery"):
+    for absent in ("finish_reason", "provider_response_id", "delivery", "error_category"):
         assert absent not in body
 
 
@@ -395,7 +395,12 @@ async def test_a_provider_error_is_failed_at_zero_never_priced_and_reraised(
     assert raised.value is failure
     assert priced == []
     body = the_report(report)
-    assert (body["status"], body["charge_nano_usd"]) == ("failed", "0")
+    # Even a timeout is "provider", as in TypeScript.
+    assert (body["status"], body["charge_nano_usd"], body["error_category"]) == (
+        "failed",
+        "0",
+        "provider",
+    )
 
 
 @pytest.mark.parametrize("kind", KINDS)
@@ -421,7 +426,11 @@ async def test_cancellation_is_priced_without_a_response_and_reraised(
         await task
     assert len(seen) == 1 and seen[0].status == "canceled" and seen[0].response is None
     body = the_report(report)
-    assert (body["status"], body["charge_nano_usd"]) == ("canceled", "3")
+    assert (body["status"], body["charge_nano_usd"], body["error_category"]) == (
+        "canceled",
+        "3",
+        "canceled",
+    )
 
 
 # --------------------------------------------------------------------------- price context

@@ -40,33 +40,39 @@ internal static class ChatMapping
       return (options, null);
     }
 
-    if (options.ReportingDeadlineMs is { } deadline)
+    string maxCharge = ValidatePremium(options.MaxCharge, options.Price?.Constant, options.ReportingDeadlineMs);
+    return (options, maxCharge);
+  }
+
+  /// <summary>
+  /// The premium-only rules shared by the chat and media adapters: the deadline bound, a canonical <paramref name="maxCharge"/>,
+  /// a canonical constant price that fits under it, and the default of the maximum from a constant price.
+  /// </summary>
+  /// <returns>The NANOUSD maximum the call declares.</returns>
+  /// <exception cref="EnlittConfigurationException">Any rule is broken.</exception>
+  internal static string ValidatePremium(string? maxCharge, string? constantPrice, long? reportingDeadlineMs)
+  {
+    if (reportingDeadlineMs is { } deadline)
     {
       CallValidation.ReportingDeadline(deadline);
     }
 
-    if (options.MaxCharge is not null)
+    if (maxCharge is not null)
     {
-      CallValidation.Nanousd(options.MaxCharge, "MaxCharge");
+      CallValidation.Nanousd(maxCharge, "MaxCharge");
     }
 
-    string? constant = options.Price?.Constant;
-    if (constant is not null)
+    if (constantPrice is not null)
     {
-      CallValidation.Nanousd(constant, "A constant Price");
-      if (options.MaxCharge is not null && Nano.Parse(constant) > Nano.Parse(options.MaxCharge))
+      CallValidation.Nanousd(constantPrice, "A constant Price");
+      if (maxCharge is not null && Nano.Parse(constantPrice) > Nano.Parse(maxCharge))
       {
         throw new EnlittConfigurationException("A constant Price above MaxCharge could never be charged in full.");
       }
     }
 
-    string? maxCharge = options.MaxCharge ?? constant;
-    if (maxCharge is null)
-    {
-      throw new EnlittConfigurationException("A premium call needs MaxCharge, or a constant Price to default it from.");
-    }
-
-    return (options, maxCharge);
+    return maxCharge ?? constantPrice
+        ?? throw new EnlittConfigurationException("A premium call needs MaxCharge, or a constant Price to default it from.");
   }
 
   /// <summary>The call identity: the base (supplied or random) plus the count of messages passed to the call.</summary>
@@ -120,6 +126,7 @@ internal static class ChatMapping
     Check(options.StopSequences is { Count: > 0 }, nameof(options.StopSequences));
     Check(options.ResponseFormat is not null and not ChatResponseFormatText, nameof(options.ResponseFormat));
     Check(options.AllowMultipleToolCalls is not null, nameof(options.AllowMultipleToolCalls));
+    Check(options.Reasoning is not null, nameof(options.Reasoning));
     Check(options.RawRepresentationFactory is not null, nameof(options.RawRepresentationFactory));
     Check(options.ConversationId is not null, nameof(options.ConversationId));
     Check(options.ToolMode is RequiredChatToolMode, nameof(options.ToolMode) + " (RequireAny/RequireSpecific)");

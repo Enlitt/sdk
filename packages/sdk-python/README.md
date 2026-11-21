@@ -23,10 +23,12 @@ image = await client.images.generate(
     enlitt=EnlittMediaCallOptions(max_charge="100000000", price="40000000"),  # $0.04
 )
 
+
 def per_second(call):
     # Your own pricing: $0.0001 per started second the provider reports, else $0.001.
     seconds = getattr(getattr(call.response, "usage", None), "seconds", None)
     return str(100_000 * math.ceil(seconds)) if seconds else "1000000"
+
 
 text = await client.audio.transcriptions.create(
     model="gpt-4o-mini-transcribe",

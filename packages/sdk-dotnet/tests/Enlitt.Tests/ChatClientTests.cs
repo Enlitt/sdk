@@ -148,6 +148,19 @@ public class ChatClientTests
   }
 
   [Fact]
+  public async Task StandardRefusesAReasoningControlBeforeAnyRequest()
+  {
+    var handler = new StubHandler(_ => StubHandler.Reply(200, CompletedBody()));
+    using IChatClient client = EnlittChatClient.Standard(Kit.Options(), Kit.Seams(handler));
+
+    var ex = await Assert.ThrowsAsync<EnlittConfigurationException>(
+        () => client.GetResponseAsync(Hello, new ChatOptions { Reasoning = new ReasoningOptions { Effort = ReasoningEffort.High } }));
+
+    Assert.Contains("Reasoning", ex.Message, StringComparison.Ordinal);
+    Assert.Empty(handler.Requests);
+  }
+
+  [Fact]
   public void StandardReportsItsMetadata()
   {
     using IChatClient client = EnlittChatClient.Standard(Kit.Options(), Kit.Seams(new StubHandler(_ => StubHandler.Reply(200, "{}"))));

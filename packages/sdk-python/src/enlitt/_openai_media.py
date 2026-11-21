@@ -250,7 +250,9 @@ class _MediaSettlement:
             return
         ended_at = datetime.now(timezone.utc)
         elapsed = time.monotonic() - self._started
-        # Only timing, and an image response's token counts, are ever reported.
+        # Only timing, an image response's token counts, and (for a call that did not
+        # complete) the error category are ever reported. As in TypeScript, every failed media
+        # call is categorized "provider".
         self._call.handle.describe(
             PremiumTerminalFacts(
                 usage=cast(Any, _image_usage(result)) if self._kind == "image" else None,
@@ -258,6 +260,13 @@ class _MediaSettlement:
                     "started_at": _rfc3339(self._started_at),
                     "ended_at": _rfc3339(ended_at),
                 },
+                error_category=(
+                    "canceled"
+                    if status == "canceled"
+                    else "provider"
+                    if status == "failed"
+                    else None
+                ),
             )
         )
         if status != "failed":

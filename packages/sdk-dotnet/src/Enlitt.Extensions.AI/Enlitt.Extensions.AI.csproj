@@ -1,11 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <PackageId>Enlitt.Extensions.AI</PackageId>
-    <Description>Microsoft.Extensions.AI IChatClient adapter for Enlitt standard and premium models.</Description>
+    <Description>Microsoft.Extensions.AI adapter for Enlitt: standard and premium chat, and premium image, speech, and transcription.</Description>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!--
+      Microsoft marks IImageGenerator, ITextToSpeechClient and ISpeechToTextClient experimental (diagnostic MEAI001).
+      The premium media wrappers implement them on purpose, so the warning is suppressed here (and TreatWarningsAsErrors
+      would otherwise fail the build). A caller that uses the media wrappers suppresses MEAI001 in its own project too.
+    -->
+    <NoWarn>$(NoWarn);MEAI001</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.AI.Abstractions" Version="9.10.2" />
+    <PackageReference Include="Microsoft.Extensions.AI.Abstractions" Version="10.11.1" />
     <ProjectReference Include="../Enlitt/Enlitt.csproj" />
     <InternalsVisibleTo Include="Enlitt.Tests" />
     <InternalsVisibleTo Include="StagingDriver" />
