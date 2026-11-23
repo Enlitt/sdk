@@ -1,6 +1,6 @@
 {
   "name": "@enlitt/protocol",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Versioned runtime schemas and wire types for Enlitt",
   "homepage": "https://enlitt.com/docs",
   "repository": {

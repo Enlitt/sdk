@@ -1,6 +1,6 @@
 {
   "name": "@enlitt/cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Terminal client for an Enlitt business account, built to be driven by a coding agent",
   "homepage": "https://enlitt.com/docs",
   "repository": {

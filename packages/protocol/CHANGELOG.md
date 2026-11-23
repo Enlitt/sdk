@@ -2,6 +2,14 @@
 
 All notable protocol changes are documented here.
 
+## 0.1.1
+
+- Added the per-application premium switch: the `premium_not_enabled` error code, `premium_enabled`
+  on application views, and `validateBusinessApplicationPremiumRequest`.
+- Added the premium cost profile's charge histogram (`PremiumUnitsHistogram`,
+  `premiumUnitsHistogramBinCount`).
+- Added the outreach visit contract (`POST`/`GET /v1/outreach/visits`).
+
 ## 0.1.0
 
 First public release.

@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.1 (unpublished)
+## 0.1.1
 
 - Premium image, speech, and transcription calls in `enlitt.openai`:
   `images.generate()`, `audio.speech.create()`, and `audio.transcriptions.create()` on the

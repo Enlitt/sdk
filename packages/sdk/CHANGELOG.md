@@ -16,6 +16,17 @@
   `EnlittAuthorizationError` with that code, from a premium start (no provider runs) or a terminal
   report (the call is not charged).
 
+- Client sign-in handoff for games and native apps: `createClientSignInHandler()` and
+  `createMemoryClientSignInStore()` from `@enlitt/sdk/server` hand a signed-in session to a client
+  with no cookie jar (loopback, redirect, or pairing).
+
+- `enlittSessionMiddleware({ header: true })` also reads the session from the `Enlitt-Session`
+  header (`ENLITT_SESSION_HEADER_NAME`) for those clients. It is off by default; when on, a
+  non-empty header wins over the cookie.
+
+- The login callback sends every outcome after a valid `state`, signed out included, to the stored
+  `returnTo` page instead of `defaultReturnTo`. A signed-out arrival carries no cookie.
+
 ## 0.1.0
 
 - First public release: the `@enlitt/sdk/vercel` and `@enlitt/sdk/openai` model adapters, the
